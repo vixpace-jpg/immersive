@@ -70,6 +70,16 @@
 #contact #contactvalue:focus{animation:none;transform:none;will-change:auto}
 #contact #contactCTA:active{animation-play-state:paused}
 @media(prefers-reduced-motion:reduce){#contact #contactvalue,#contact #contactCTA{animation:none}}
+/* VOID 007: explicit heavy clean black sans, no decorative glitch font */
+#statement .word,#contact #contactTitle{
+ font-family:Arial,"Helvetica Neue",Helvetica,system-ui,sans-serif!important;
+ font-weight:900!important;font-stretch:normal!important;letter-spacing:-.07em;
+ text-shadow:none!important;filter:none!important;font-style:normal!important;
+}
+#statement .word{font-size:clamp(54px,15vw,124px);transform:none!important}
+#statement .glyph,#contact #contactTitle .glyph{font-family:inherit!important;font-weight:900!important;filter:none!important;animation-name:void-clean-letter!important;animation-duration:.24s!important;animation-timing-function:ease-out!important}
+@keyframes void-clean-letter{from{opacity:0;transform:translateY(9px);filter:none}to{opacity:1;transform:none;filter:none}}
+#contact #contactCTA,#contact #contactCTA .glyph{font-family:Arial,"Helvetica Neue",Helvetica,system-ui,sans-serif!important;font-weight:800!important;filter:none!important;text-shadow:none!important;animation-name:void-clean-letter!important}
 /* VOID 006: single Monolith scene and touch-following countdown */
 #holdcount{width:82px;height:82px;border-radius:50%;display:none;align-items:center;justify-content:center;font:400 27px/1 ui-monospace,monospace;letter-spacing:-.055em;transform:translate(-50%,-50%);color:#fff;border:1px solid rgba(255,255,255,.12);background:radial-gradient(circle,rgba(0,0,0,.89) 0%,rgba(0,0,0,.67) 55%,transparent 72%);box-shadow:0 0 28px rgba(0,0,0,.65);filter:none;isolation:isolate}
 #holdcount.show{display:flex}
