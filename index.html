@@ -260,10 +260,29 @@
  font-size:clamp(22px,5.8vw,32px)!important;
  letter-spacing:-.055em!important;
 }
+/* VOID 023 — visibly larger split-flap, distinctly smaller contact headline, mono footer */
+#statement #statementWord{max-width:calc(100vw - 20px)!important;line-height:1.07!important}
+#statement #statementWord .flap-line{line-height:1.07!important;max-width:none!important;white-space:nowrap!important}
+#statement #statementWord .flap-char{font-size:clamp(21px,6.35vw,34px)!important}
+#statement #statementWord .flap-char.font-unbounded{font-size:clamp(20px,5.85vw,31px)!important}
+#statement #statementWord .flap-char.font-michroma{font-size:clamp(19px,5.55vw,29px)!important}
+@media(max-width:390px){
+ #statement #statementWord .flap-char{font-size:6.25vw!important}
+ #statement #statementWord .flap-char.font-unbounded{font-size:5.75vw!important}
+ #statement #statementWord .flap-char.font-michroma{font-size:5.45vw!important}
+}
+#contact #contactTitle{font-size:clamp(25px,6.4vw,49px)!important;line-height:1.08!important}
+#ui #phase{
+ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace!important;
+ font-size:clamp(22px,5.9vw,32px)!important;
+ font-weight:400!important;
+ letter-spacing:-.04em!important;
+ text-shadow:none!important;
+}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
-<section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 022</div></section>
-<div class="ui" id="ui"><div class="head"><span>VOID — 022</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · TILT</div><div class="foot"><div><div class="phase" id="phase">vincenzopace</div><div class="phase-meta" id="descriptor">creative robeaccaso director</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
+<section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 023</div></section>
+<div class="ui" id="ui"><div class="head"><span>VOID — 023</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · TILT</div><div class="foot"><div><div class="phase" id="phase">vincenzopace</div><div class="phase-meta" id="descriptor">creative robeaccaso director</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
 <div id="prompt" role="status" aria-live="polite"></div><button id="motion">ENABLE MOTION</button><button id="camera" aria-pressed="false" title="Camera light modulates an abstract background; no images are saved">CAMERA / OFF</button><div id="lightmeter" aria-live="off"><div class="reading"><span>LIGHT</span><span id="lightvalue">--%</span></div><div class="track"><div class="fill" id="lightfill"></div></div></div>
 <div id="statement" aria-hidden="true"><span class="word" id="statementWord"></span></div>
 <div id="holdcount" aria-hidden="true"></div><div id="holdnumber" aria-live="off">5</div>
