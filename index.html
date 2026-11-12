@@ -111,6 +111,10 @@
 #contact #contactTitle{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif!important;font-size:clamp(34px,9vw,66px);line-height:1.05;font-weight:900!important;letter-spacing:-.065em}
 #contact #contactTitle .glyph{display:inline-block;white-space:pre;animation:letter-decode .3s ease-out both}
 @media(prefers-reduced-motion:reduce){#contact #contactCTA{animation:none!important}}
+
+/* VOID 011 — centered contact field */
+#contact #contactvalue{text-align:center!important}
+#contact #contactvalue::placeholder{text-align:center;color:rgba(232,231,226,.7)}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
 <section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 002</div></section>
@@ -139,7 +143,7 @@ const distortCanvas=document.createElement('canvas'),distortCtx=distortCanvas.ge
 let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // The experience rests after twenty seconds without touch, independent of camera and motion.
 const IDLE_FADE_MS=20000;let lastTouch=performance.now(),idleBlack=0;
-let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, firstTouchAt=null, phraseStarted=false, phraseFinished=false, scrollOffset=0, scrollVelocity=0, lastPointerY=null;
+let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, enteredAt=null, phraseStarted=false, phraseFinished=false, scrollOffset=0, scrollVelocity=0, lastPointerY=null;
 const messageLines=['STILL STANDING HERE?','HOLD FOR 5 SECONDS','AND CHANGE YOUR VISION.'];
 const messageText=messageLines.join('');
 const flapGlyphs=[];
@@ -158,9 +162,9 @@ function setupFlap(){
  });
 }
 function runFlap(now){
- if(firstTouchAt===null||now-firstTouchAt<45000)return;
+ if(enteredAt===null||now-enteredAt<5000)return;
  if(!phraseStarted){phraseStarted=true;setupFlap();markInteraction();$('statement').classList.add('show')}
- const elapsed=now-firstTouchAt-45000;
+ const elapsed=now-enteredAt-5000;
  const total=6000;
  if(elapsed>=total){
   if(!phraseFinished){phraseFinished=true;flapGlyphs.forEach(span=>{span.textContent=span.dataset.target;span.classList.remove('active');span.classList.add('locked');span.style.setProperty('--flip','0deg')})}
@@ -232,8 +236,8 @@ async function toggleCamera(){markInteraction();if(cameraBusy)return;if(cameraAc
 $('camera').addEventListener('click',toggleCamera);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&cameraActive)stopCamera()});
 function sampleCamera(now){if(!cameraActive||!cameraCtx||now-lastCameraSample<130)return;lastCameraSample=now;if(cameraVideo.readyState<2)return;try{const vw=cameraVideo.videoWidth||320,vh=cameraVideo.videoHeight||240,ratio=Math.max(48/vw,72/vh),cw=48/ratio,ch=72/ratio;cameraCtx.drawImage(cameraVideo,(vw-cw)/2,(vh-ch)/2,cw,ch,0,0,48,72);const frameData=cameraCtx.getImageData(0,0,48,72),pixels=frameData.data;let sum=0;for(let i=0;i<pixels.length;i+=4){const r=pixels[i]/255,g=pixels[i+1]/255,b=pixels[i+2]/255;sum+=.2126*r*r+.7152*g*g+.0722*b*b;const gray=Math.round(.2126*pixels[i]+.7152*pixels[i+1]+.0722*pixels[i+2]);pixels[i]=gray;pixels[i+1]=gray;pixels[i+2]=gray}cameraCtx.putImageData(frameData,0,0);cameraLight=clamp(Math.sqrt(sum/(pixels.length/4)),0,1);cameraSamples++;lightLow=Math.min(cameraLight,lightLow);lightHigh=Math.max(cameraLight,lightHigh);$('lightvalue').textContent=Math.round(cameraLight*100)+'%';$('lightfill').style.width=Math.round(cameraLight*100)+'%';$('sensor').textContent='LIGHT / '+Math.round(cameraLight*100)+'%';cameraError=false}catch(e){if(!cameraError){cameraError=true;$('lightvalue').textContent='ERR';announce('LIGHT SENSOR ERROR')}}}
-$('enter').addEventListener('click',()=>{run=true;markInteraction();scene=2;form=2;idleBlack=0;$('intro').classList.add('off');$('ui').classList.add('show');if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')$('motion').classList.add('show');else motion();if(!raf)raf=requestAnimationFrame(frame)});
-canvas.addEventListener('pointerdown',e=>{if(!run||completed)return;markInteraction();if(firstTouchAt===null)firstTouchAt=performance.now();point={x:e.clientX/w,y:e.clientY/h};lastPointerY=e.clientY;down={x:e.clientX,y:e.clientY,currentX:e.clientX,currentY:e.clientY,t:performance.now(),pointerId:e.pointerId};holding=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{holding=true;announce('HOLD / GRAVITY')},440);try{canvas.setPointerCapture(e.pointerId)}catch{}});
+$('enter').addEventListener('click',()=>{run=true;markInteraction();enteredAt=performance.now();scene=2;form=2;idleBlack=0;$('intro').classList.add('off');$('ui').classList.add('show');if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')$('motion').classList.add('show');else motion();if(!raf)raf=requestAnimationFrame(frame)});
+canvas.addEventListener('pointerdown',e=>{if(!run||completed)return;markInteraction();point={x:e.clientX/w,y:e.clientY/h};lastPointerY=e.clientY;down={x:e.clientX,y:e.clientY,currentX:e.clientX,currentY:e.clientY,t:performance.now(),holdStart:null,pointerId:e.pointerId};holding=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{holding=true;announce('HOLD / GRAVITY')},440);try{canvas.setPointerCapture(e.pointerId)}catch{}});
 canvas.addEventListener('pointermove',e=>{if(!run||completed)return;point={x:e.clientX/w,y:e.clientY/h};if(down&&e.pointerId===down.pointerId){markInteraction();const deltaY=e.clientY-down.currentY;/* scroll interaction temporarily suspended for testing */down.currentX=e.clientX;down.currentY=e.clientY;holding=true;}});
 function end(e){if(!down||completed)return;markInteraction();$('holdcount').classList.remove('show');$('holdnumber').classList.remove('show');clearTimeout(holdTimer);let dx=e.clientX-down.x,dy=e.clientY-down.y,d=Math.hypot(dx,dy);down=null;if(holding){holding=false;pulse=1.7;energy=1.25;announce('RELEASE');return}if(d>45){pulse=1.1;announce('MONOLITH')}else{point={x:e.clientX/w,y:e.clientY/h};pulse=1.5;energy=.9;announce('IMPULSE')}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',()=>{down=null;holding=false;$('holdcount').classList.remove('show');$('holdnumber').classList.remove('show');clearTimeout(holdTimer)});
@@ -276,27 +280,28 @@ const cx=w*.47+tilt.x*38,cy=h*.41+tilt.y*47,spread=w*.98;
 ctx.save();ctx.globalCompositeOperation='screen';
 for(let k=0;k<5;k++){const xx=cx+Math.sin(time*.13+k*1.51)*w*.35,yy=cy+Math.cos(time*.11+k*.83)*h*.22;let r=spread*(.65+k*.10);let g=ctx.createRadialGradient(xx,yy,0,xx,yy,r);let op=(.10+.05*Math.sin(time*.25+k));g.addColorStop(0,'rgba(217,205,188,'+op+')');g.addColorStop(.38,'rgba(115,113,111,'+(op*.27)+')');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}ctx.restore()}
 function frame(now){raf=requestAnimationFrame(frame);let dt=Math.min(.045,(now-last||16)/1000);last=now;if(!run||completed)return;time+=dt*(reduced?.25:1);sampleCamera(now);filteredLight=lerp(filteredLight,cameraActive?cameraLight:.5,Math.min(1,dt*2.3));form=lerp(form,scene,Math.min(1,dt*2));tilt.x=lerp(tilt.x,target.x,Math.min(1,dt*3));tilt.y=lerp(tilt.y,target.y,Math.min(1,dt*3));drag.x*=Math.exp(-dt*1.7);drag.y*=Math.exp(-dt*1.7);pulse*=Math.exp(-dt*2.9);energy=lerp(energy,holding?2.0:0,Math.min(1,dt*2.8));depth*=Math.exp(-dt*.42);
-// Ring follows the active pointer; uninterrupted hold lasts six seconds even while moving.
+// The hold remains liquid immediately; the countdown only activates after the six-second phrase finishes.
+ runFlap(now);
  if(down){
-  const held=performance.now()-down.t;
-  liquidForce=lerp(liquidForce,clamp(held/1900,0,1),Math.min(1,dt*8));
-  if(held>=500){
+  const liquidHeld=now-down.t;
+  liquidForce=lerp(liquidForce,clamp(liquidHeld/1300,0,1),Math.min(1,dt*8));
+  if(phraseFinished){
+   if(down.holdStart===null)down.holdStart=now;
+   const held=now-down.holdStart;
    const counter=$('holdcount'),number=$('holdnumber');
    counter.classList.add('show');number.classList.add('show');
    const ringX=clamp(down.currentX,48,w-48),ringY=clamp(down.currentY,48,h-48);
    counter.style.left=ringX+'px';counter.style.top=ringY+'px';
    counter.style.setProperty('--progress',Math.min(100,held/5000*100).toFixed(1)+'%');
-   // The number sits 35 CSS px beyond the ring's 41px radius.
    number.style.left=ringX+'px';
    number.style.top=(ringY>=123?ringY-76:ringY+76)+'px';
    number.textContent=String(Math.max(0,5-Math.floor(held/1000)));
+   if(held>=6000){completeJourney();return}
   }
-  if(held>=6000){completeJourney();return}
  }else{liquidForce=lerp(liquidForce,0,Math.min(1,dt*3))}
- runFlap(now);
  $('statement').style.transform=liquidForce>.001?'translate('+Math.sin(time*4)*liquidForce*7+'px,'+Math.cos(time*3)*liquidForce*5+'px) skewX('+Math.sin(time*4)*liquidForce*4+'deg)':'none';
-// Keep the 45-second wait and six-second message reveal visible before idling.
-const awaitingMessage=firstTouchAt!==null&&!phraseFinished;
+// Keep the five-second wait and six-second message reveal visible before idling.
+const awaitingMessage=enteredAt!==null&&!phraseFinished;
 if(awaitingMessage)lastTouch=performance.now();
 const idleElapsed=Math.max(0,performance.now()-lastTouch);
 const idleProgress=clamp(idleElapsed/IDLE_FADE_MS,0,1);
