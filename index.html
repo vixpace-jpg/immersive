@@ -26,6 +26,23 @@
 #contact .note{font:11px/1.6 system-ui,sans-serif;color:#777;margin-top:15px;max-width:340px}
 #contact #contactstatus{min-height:20px;color:#e1ad82;font:11px system-ui,sans-serif}
 @media(max-width:420px){#statement .word{font-size:15vw}}
+
+/* 004 kinetic digital typography */
+#statement .word{font-family:"Arial Narrow",Impact,system-ui,sans-serif;font-size:clamp(48px,15vw,126px);font-weight:900;letter-spacing:-.075em;line-height:1.05;text-shadow:1px 0 rgba(255,255,255,.27),-3px 0 rgba(150,150,150,.17);min-height:1.1em;transform:none;filter:none;transition:none}
+#statement .word::before,#statement .word::after{display:none}
+#statement .glyph{display:inline-block;position:relative;white-space:pre;animation:letter-decode .28s steps(3,end) both;transform-origin:50% 70%;filter:drop-shadow(0 0 4px rgba(255,255,255,.19))}
+#statement .glyph:nth-child(3n){animation-duration:.36s}
+#statement .glyph:nth-child(4n){animation-duration:.20s}
+@keyframes letter-decode{0%{opacity:0;transform:translateY(-20px) scaleY(1.9) skewX(30deg);filter:blur(6px)}36%{opacity:1;transform:translate(3px,4px) scaleY(.63) skewX(-24deg)}65%{opacity:.5;transform:translate(-2px,-1px) scaleY(1.15) skewX(12deg)}100%{opacity:1;transform:none;filter:blur(0)}}
+#statement .cursor{display:inline-block;width:.065em;height:.72em;vertical-align:-.05em;margin-left:.04em;background:#f0e6d9;animation:cursor-blink .62s steps(1) infinite}
+@keyframes cursor-blink{50%{opacity:0}}
+#contact .decode-target{visibility:hidden}
+#contact .decode-target.decode-on{visibility:visible}
+#contact .decode-target .glyph{display:inline-block;white-space:pre;animation:letter-decode .32s steps(3,end) both}
+#contact h1{font-family:Impact,"Arial Narrow",system-ui,sans-serif;font-weight:800;letter-spacing:-.065em;text-transform:uppercase;font-size:clamp(38px,10vw,80px)}
+#contact button.decode-target{overflow:hidden}
+#contact input{transition:opacity .6s,border-color .3s}
+@media(prefers-reduced-motion:reduce){#statement .glyph,#contact .glyph{animation:none}}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
 <section id="intro"><button class="enter" id="enter">ENTRA</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 002</div></section>
@@ -35,10 +52,10 @@
 <div id="holdcount" aria-live="off"></div>
 <section id="contact" aria-label="Richiedi un contatto">
   <div class="mini">VOID / BEYOND THE SURFACE</div>
-  <h1>La tua visione<br>inizia qui.</h1>
+  <h1 id="contactTitle" class="decode-target" data-text="LA TUA VISIONE\nINIZIA QUI.">LA TUA VISIONE<br>INIZIA QUI.</h1>
   <form id="contactform">
     <input id="contactvalue" name="contact" required autocomplete="email" placeholder="Email o numero di telefono" aria-label="Email o numero di telefono" maxlength="180">
-    <button type="submit">ABBRACCIA IL CAMBIAMENTO</button>
+    <button type="submit" id="contactCTA" class="decode-target" data-text="ABBRACCIA IL CAMBIAMENTO">ABBRACCIA IL CAMBIAMENTO</button>
     <div id="contactstatus" role="status"></div>
   </form>
   <div class="note">Prototipo: i recapiti non vengono inviati né salvati. Il collegamento al servizio di contatto è da configurare.</div>
@@ -53,27 +70,57 @@ let noiseCanvas=document.createElement('canvas'),grain=noiseCanvas.getContext('2
 let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // The experience rests after twenty seconds without touch, independent of camera and motion.
 const IDLE_FADE_MS=20000;let lastTouch=performance.now(),idleBlack=0;
-let completed=false, liquidForce=0, flashTrail=0, trailSeed=0, prevWord=-1;
+let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, firstTouchAt=null, prevWord=-1, typingStart=0, lastTyped=-1;
 const words=['Sei','ancora','fermo','qui?','Tieni','premuto','per','5','secondi','e','cambierai','la','tua','visione.'];
+// Each word is built character by character only after ten seconds from first canvas touch.
+function glyphFor(char,i){
+ const span=document.createElement('span');span.className='glyph';span.textContent=char;
+ span.style.animationDelay=(i*34)+'ms';return span;
+}
+function setTyped(element,word,visible){
+ element.replaceChildren();
+ for(let i=0;i<Math.min(visible,word.length);i++)element.appendChild(glyphFor(word[i],i));
+ if(visible<word.length){const cursor=document.createElement('span');cursor.className='cursor';element.appendChild(cursor)}
+}
 function changeWord(now){
- const i=Math.floor(now/720)%words.length;
- if(i===prevWord)return;
- prevWord=i;
- const t=$('statementWord'),word=words[i];t.textContent=word;t.dataset.word=word;
- const n=i+1,flip=n%4;
- t.style.setProperty('--rot',((n*17)%29-14)+'deg');
- t.style.setProperty('--skew',((n*31)%45-22)+'deg');
- t.style.setProperty('--sx',(flip===0?.67:flip===2?1.25:.9));
- t.style.setProperty('--sy',(flip===1?1.48:flip===3?.68:1.15));
- t.style.setProperty('--tear',(((n*13)%39)-19)+'px');
- t.style.filter='blur('+(i%6===0?1.7:.3)+'px)';
+ if(firstTouchAt===null||now-firstTouchAt<10000)return;
+ const elapsed=now-firstTouchAt-10000;
+ const slot=Math.floor(elapsed/2000),i=slot%words.length;
+ const word=words[i],local=elapsed%2000;
+ const visible=Math.min(word.length,Math.floor(local/95)+1);
+ if(i!==prevWord||visible!==lastTyped){
+  prevWord=i;lastTyped=visible;
+  const t=$('statementWord');
+  setTyped(t,word,visible);
+  t.style.transform='skewX('+(((i*13)%17)-8)+'deg) scaleX('+(i%3===0?.87:1.04)+')';
+  t.style.opacity=(local>1690?Math.max(.05,(2000-local)/310):1);
+ }
+}
+function animateFinalText(){
+ const targets=[$('contactTitle'),$('contactCTA')];
+ targets.forEach((el,index)=>{
+  const str=el.dataset.text,delay=index===0?420:2050;
+  el.replaceChildren();el.classList.add('decode-on');
+  const lines=str.split('\\n');
+  let chars=0;
+  for(let j=0;j<lines.length;j++){
+   if(j)el.appendChild(document.createElement('br'));
+   for(const letter of lines[j]){
+    const glyph=glyphFor(letter,chars);glyph.style.animationDelay=(delay+chars*65)+'ms';
+    glyph.style.opacity='0';glyph.style.animationFillMode='both';
+    el.appendChild(glyph);chars++;
+   }
+  }
+ });
+ const input=$('contactvalue');input.style.opacity='0';
+ setTimeout(()=>{input.style.opacity='1'},1700);
 }
 function completeJourney(){
  if(completed)return;completed=true;down=null;holding=false;clearTimeout(holdTimer);
  $('holdcount').classList.remove('show');stopCamera();
  $('camera').style.display='none';$('motion').style.display='none';$('lightmeter').style.display='none';
  $('statement').classList.remove('show');$('ui').classList.remove('show');
- const el=$('contact');el.classList.add('show');
+ const el=$('contact');el.classList.add('show');animateFinalText();
 }
 $('contactform').addEventListener('submit',async ev=>{
  ev.preventDefault();
@@ -99,8 +146,8 @@ async function toggleCamera(){markInteraction();if(cameraBusy)return;if(cameraAc
 $('camera').addEventListener('click',toggleCamera);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&cameraActive)stopCamera()});
 function sampleCamera(now){if(!cameraActive||!cameraCtx||now-lastCameraSample<130)return;lastCameraSample=now;if(cameraVideo.readyState<2)return;try{const vw=cameraVideo.videoWidth||320,vh=cameraVideo.videoHeight||240,ratio=Math.max(48/vw,72/vh),cw=48/ratio,ch=72/ratio;cameraCtx.drawImage(cameraVideo,(vw-cw)/2,(vh-ch)/2,cw,ch,0,0,48,72);const frameData=cameraCtx.getImageData(0,0,48,72),pixels=frameData.data;let sum=0;for(let i=0;i<pixels.length;i+=4){const r=pixels[i]/255,g=pixels[i+1]/255,b=pixels[i+2]/255;sum+=.2126*r*r+.7152*g*g+.0722*b*b;const gray=Math.round(.2126*pixels[i]+.7152*pixels[i+1]+.0722*pixels[i+2]);pixels[i]=gray;pixels[i+1]=gray;pixels[i+2]=gray}cameraCtx.putImageData(frameData,0,0);cameraLight=clamp(Math.sqrt(sum/(pixels.length/4)),0,1);cameraSamples++;lightLow=Math.min(cameraLight,lightLow);lightHigh=Math.max(cameraLight,lightHigh);$('lightvalue').textContent=Math.round(cameraLight*100)+'%';$('lightfill').style.width=Math.round(cameraLight*100)+'%';$('sensor').textContent='LIGHT / '+Math.round(cameraLight*100)+'%';cameraError=false}catch(e){if(!cameraError){cameraError=true;$('lightvalue').textContent='ERR';announce('LIGHT SENSOR ERROR')}}}
-$('enter').addEventListener('click',()=>{run=true;markInteraction();idleBlack=0;$('statement').classList.add('show');$('intro').classList.add('off');$('ui').classList.add('show');if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')$('motion').classList.add('show');else motion();if(!raf)raf=requestAnimationFrame(frame)});
-canvas.addEventListener('pointerdown',e=>{if(!run||completed)return;markInteraction();point={x:e.clientX/w,y:e.clientY/h};down={x:e.clientX,y:e.clientY,t:performance.now()};holding=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{holding=true;announce('HOLD / GRAVITY')},440);try{canvas.setPointerCapture(e.pointerId)}catch{}});
+$('enter').addEventListener('click',()=>{run=true;markInteraction();idleBlack=0;$('intro').classList.add('off');$('ui').classList.add('show');if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')$('motion').classList.add('show');else motion();if(!raf)raf=requestAnimationFrame(frame)});
+canvas.addEventListener('pointerdown',e=>{if(!run||completed)return;markInteraction();if(firstTouchAt===null){firstTouchAt=performance.now();$('statement').classList.add('show')}point={x:e.clientX/w,y:e.clientY/h};down={x:e.clientX,y:e.clientY,t:performance.now()};holding=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{holding=true;announce('HOLD / GRAVITY')},440);try{canvas.setPointerCapture(e.pointerId)}catch{}});
 canvas.addEventListener('pointermove',e=>{if(!run||completed)return;point={x:e.clientX/w,y:e.clientY/h};if(down){markInteraction();const dx=e.clientX-down.x,dy=e.clientY-down.y;if(Math.hypot(dx,dy)>16){clearTimeout(holdTimer);if(!holding){drag.x=clamp(dx/w,-1,1);drag.y=clamp(dy/h,-1,1)}}}});
 function end(e){if(!down||completed)return;markInteraction();$('holdcount').classList.remove('show');clearTimeout(holdTimer);let dx=e.clientX-down.x,dy=e.clientY-down.y,d=Math.hypot(dx,dy);down=null;if(holding){holding=false;pulse=1.7;energy=1.25;announce('RELEASE');return}if(d>45){if(Math.abs(dx)>Math.abs(dy)){choose(scene+(dx<0?1:-1))}else{depth=clamp(depth+(dy<0?.48:-.48),-1.5,1.5);pulse=1.25;announce(dy<0?'EXPAND':'COMPRESS')}}else{point={x:e.clientX/w,y:e.clientY/h};pulse=1.5;energy=.9;announce('IMPULSE')}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',()=>{down=null;holding=false;clearTimeout(holdTimer)});
@@ -155,7 +202,7 @@ function frame(now){raf=requestAnimationFrame(frame);let dt=Math.min(.045,(now-l
   }
   if(held>=6000){completeJourney();return}
  }else{liquidForce=lerp(liquidForce,0,Math.min(1,dt*3))}
- changeWord(performance.now());
+ changeWord(now);
 const idleElapsed=Math.max(0,performance.now()-lastTouch);
 const idleProgress=clamp(idleElapsed/IDLE_FADE_MS,0,1);
 const eased=idleProgress*idleProgress*(3-2*idleProgress);
@@ -182,16 +229,32 @@ if(form<1.15){ctx.save();ctx.globalAlpha=clamp(1-form*.6,0,1);atmosphere();ctx.r
 const opacity=clamp(.24+form*.56,0,1);
 ctx.save();ctx.globalAlpha=opacity;field(clamp(form/2,0,1),dt);ctx.restore();
 if(form>.5){ctx.save();ctx.globalAlpha=clamp((form-.5)*.20,0,.25);let g=ctx.createRadialGradient(cx,cy,30,cx,cy,w*.95);g.addColorStop(0,'#e0d9ce');g.addColorStop(1,'#000');ctx.globalCompositeOperation='screen';ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.restore()}
-// Brief, non-repeating fluorescent orange curved streak every five seconds.
-if(Math.floor(time/5)>trailSeed){trailSeed=Math.floor(time/5);flashTrail=1}
-if(flashTrail>0.003){
- const t=1-flashTrail;
- ctx.save();ctx.globalCompositeOperation='screen';ctx.lineCap='round';
- const path=new Path2D(),from=-w*.25+t*w*1.5;
- path.moveTo(from,-h*.12);path.bezierCurveTo(from+w*.7,h*.17,from-w*.37,h*.64,from+w*.66,h*1.12);
- ctx.strokeStyle='rgba(255,112,20,'+(flashTrail*.7).toFixed(3)+')';ctx.lineWidth=1.8;ctx.shadowColor='#ff6d0a';ctx.shadowBlur=18;ctx.stroke(path);
- ctx.lineWidth=7;ctx.globalAlpha=flashTrail*.13;ctx.stroke(path);ctx.restore();
- flashTrail*=Math.exp(-dt*1.8);
+// Animated orange light ribbon: its head advances and a soft fading tail follows.
+if(Math.floor(time/5)>trailSeed){trailSeed=Math.floor(time/5);trailStarted=time}
+if(trailStarted>=0){
+ const age=time-trailStarted;
+ const u=Math.min(1,age/1.9);
+ if(age<3.3){
+  const bezier=t=>{
+   const q=1-t;
+   return {
+    x:q*q*q*(-w*.25)+3*q*q*t*(w*.6)+3*q*t*t*(-w*.2)+t*t*t*(w*1.25),
+    y:q*q*q*(-h*.10)+3*q*q*t*(h*.16)+3*q*t*t*(h*.85)+t*t*t*(h*1.13)
+   };
+  };
+  const begin=Math.max(0,u-.48),steps=28;
+  ctx.save();ctx.globalCompositeOperation='screen';ctx.lineCap='round';
+  for(let k=1;k<=steps;k++){
+   const a=begin+(u-begin)*(k-1)/steps,b=begin+(u-begin)*k/steps;
+   if(b<=a)continue;
+   const pa=bezier(a),pb=bezier(b);
+   const tail=(k/steps)**1.9,fade=Math.min(1,(3.3-age)*1.3);
+   ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);
+   ctx.strokeStyle='rgba(255,105,12,'+(tail*.72*fade).toFixed(3)+')';
+   ctx.lineWidth=.5+tail*2.1;ctx.shadowColor='#ff6d0a';ctx.shadowBlur=11+tail*14;ctx.stroke();
+  }
+  ctx.restore();
+ }
 }
 ctx.save();ctx.globalAlpha=.06+(scene===0?.07:.018);ctx.imageSmoothingEnabled=true;ctx.drawImage(noiseCanvas,0,0,w,h);ctx.restore();
 let vignette=ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*.2,w/2,h/2,Math.max(w,h)*.82);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,0,0,.83)');ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
