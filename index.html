@@ -89,9 +89,9 @@ $('lightmeter').style.opacity=(1-idleBlack).toFixed(3);
 if($('motion').classList.contains('show'))$('motion').style.opacity=(1-idleBlack).toFixed(3);
 const cx=w*.5+tilt.x*w*.07,cy=h*.48+tilt.y*h*.06;
 background(cx,cy,form<.7);
-// Very dark, strongly defocused live camera texture below all VOID materials.
+// Dark, moderately defocused live camera texture with visible silhouettes below VOID materials.
 // The same tiny local camera buffer drives the light meter; no image is stored or uploaded.
-if(cameraActive&&cameraSamples>0){ctx.save();ctx.filter='blur(32px)';ctx.globalAlpha=.55;ctx.drawImage(cameraCanvas,-38,-38,w+76,h+76);ctx.restore();ctx.fillStyle='rgba(0,0,0,.74)';ctx.fillRect(0,0,w,h)}
+if(cameraActive&&cameraSamples>0){ctx.save();ctx.filter='blur(11px)';ctx.globalAlpha=.96;ctx.drawImage(cameraCanvas,-15,-15,w+30,h+30);ctx.restore();ctx.fillStyle='rgba(0,0,0,.37)';ctx.fillRect(0,0,w,h)}
 if(form<1.15){ctx.save();ctx.globalAlpha=clamp(1-form*.6,0,1);atmosphere();ctx.restore()}
 const opacity=clamp(.24+form*.56,0,1);
 ctx.save();ctx.globalAlpha=opacity;field(clamp(form/2,0,1),dt);ctx.restore();
@@ -99,7 +99,7 @@ if(form>.5){ctx.save();ctx.globalAlpha=clamp((form-.5)*.20,0,.25);let g=ctx.crea
 ctx.save();ctx.globalAlpha=.10+(scene===0?.12:.045);ctx.imageSmoothingEnabled=true;ctx.drawImage(noiseCanvas,0,0,w,h);ctx.restore();
 let vignette=ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*.2,w/2,h/2,Math.max(w,h)*.82);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,0,0,.83)');ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
 // Camera modulates exposure in addition to the abstract live background; pixels remain local.
-if(cameraActive&&cameraSamples>0){const normalized=clamp((filteredLight-.08)/.78,0,1);const delta=normalized-.5;if(delta>0){const strength=Math.pow(delta*2,1.25);const g=ctx.createRadialGradient(w*.5,h*.46,0,w*.5,h*.46,Math.max(w,h)*.78);g.addColorStop(0,'rgba(233,226,215,'+(strength*.48).toFixed(3)+')');g.addColorStop(.55,'rgba(171,166,158,'+(strength*.25).toFixed(3)+')');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}else{ctx.fillStyle='rgba(0,0,0,'+(Math.pow(-delta*2,1.2)*.82).toFixed(3)+')';ctx.fillRect(0,0,w,h)}}
+if(cameraActive&&cameraSamples>0){const normalized=clamp((filteredLight-.08)/.78,0,1);const delta=normalized-.5;if(delta>0){const strength=Math.pow(delta*2,1.25);const g=ctx.createRadialGradient(w*.5,h*.46,0,w*.5,h*.46,Math.max(w,h)*.78);g.addColorStop(0,'rgba(233,226,215,'+(strength*.48).toFixed(3)+')');g.addColorStop(.55,'rgba(171,166,158,'+(strength*.25).toFixed(3)+')');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}else{ctx.fillStyle='rgba(0,0,0,'+(Math.pow(-delta*2,1.2)*.30).toFixed(3)+')';ctx.fillRect(0,0,w,h)}}
 if(idleBlack>0.001){ctx.fillStyle='rgba(0,0,0,'+idleBlack.toFixed(4)+')';ctx.fillRect(0,0,w,h)}
 }
 })();
