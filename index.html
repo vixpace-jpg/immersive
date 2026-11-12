@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it"><head>
+<html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="theme-color" content="#030303"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml">
@@ -86,22 +86,32 @@
 #holdcount::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -90deg,#ff781f var(--progress,0%),rgba(255,255,255,.17) var(--progress,0%));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));pointer-events:none}
 #holdcount::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(255,117,25,.19);pointer-events:none}
 #statement{transform-origin:center;will-change:transform}
+
+/* VOID 008 - restrained railway split-flap lettering */
+#statement .word{font-family:Arial,"Helvetica Neue",system-ui,sans-serif!important;font-size:clamp(19px,5.8vw,29px)!important;font-weight:900!important;line-height:1.42!important;letter-spacing:.008em!important;max-width:min(92vw,530px);text-shadow:none!important;transform:none!important;filter:none!important;text-align:center}
+#statement .flap-line{display:block;white-space:nowrap}
+#statement .flap-char{display:inline-block;min-width:.59em;font-variant-numeric:tabular-nums;white-space:pre;vertical-align:middle;position:relative;transform:perspective(130px) rotateX(var(--flip,0deg));transition:transform .12s linear;opacity:var(--alpha,1)}
+#statement .flap-char.space{min-width:.36em}
+#statement .flap-char.active{color:#f1eee9;text-shadow:0 0 8px rgba(255,255,255,.17);background:linear-gradient(to bottom,transparent 48%,rgba(0,0,0,.43) 49%,transparent 53%)}
+#statement .flap-char.locked{color:#d4d3d0;background:none;transform:none;opacity:1}
+#contact .mini,#contact .note{line-height:1.65}
+@media(prefers-reduced-motion:reduce){#statement .flap-char{transition:none}}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
-<section id="intro"><button class="enter" id="enter">ENTRA</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 002</div></section>
-<div class="ui" id="ui"><div class="head"><span>VOID — 002</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · TILT</div><div class="foot"><div><div class="phase" id="phase">Monolith</div><div class="phase-meta" id="descriptor">SCULPTED MATTER</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
-<div id="prompt" role="status" aria-live="polite"></div><button id="motion">ABILITA MOVIMENTO</button><button id="camera" aria-pressed="false" title="La fotocamera modula la luce e crea uno sfondo astratto, senza salvare immagini">CAMERA / OFF</button><div id="lightmeter" aria-live="off"><div class="reading"><span>LIGHT</span><span id="lightvalue">--%</span></div><div class="track"><div class="fill" id="lightfill"></div></div></div>
+<section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 002</div></section>
+<div class="ui" id="ui"><div class="head"><span>VOID — 002</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · SCROLL · TILT</div><div class="foot"><div><div class="phase" id="phase">Monolith</div><div class="phase-meta" id="descriptor">SCULPTED MATTER</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
+<div id="prompt" role="status" aria-live="polite"></div><button id="motion">ENABLE MOTION</button><button id="camera" aria-pressed="false" title="Camera light modulates an abstract background; no images are saved">CAMERA / OFF</button><div id="lightmeter" aria-live="off"><div class="reading"><span>LIGHT</span><span id="lightvalue">--%</span></div><div class="track"><div class="fill" id="lightfill"></div></div></div>
 <div id="statement" aria-hidden="true"><span class="word" id="statementWord"></span></div>
 <div id="holdcount" aria-live="off"><span id="holdnumber">5</span></div>
-<section id="contact" aria-label="Richiedi un contatto">
+<section id="contact" aria-label="Request a callback">
   <div class="mini">VOID / BEYOND THE SURFACE</div>
-  <h1 id="contactTitle" class="decode-target" data-text="LA TUA VISIONE\nINIZIA QUI.">LA TUA VISIONE<br>INIZIA QUI.</h1>
+  <h1 id="contactTitle" class="decode-target" data-text="A NEW VISION\nSTARTS HERE.">A NEW VISION<br>STARTS HERE.</h1>
   <form id="contactform">
-    <input id="contactvalue" name="contact" required autocomplete="email" placeholder="Email o numero di telefono" aria-label="Email o numero di telefono" maxlength="180">
-    <button type="submit" id="contactCTA" class="decode-target" data-text="ABBRACCIA IL CAMBIAMENTO">ABBRACCIA IL CAMBIAMENTO</button>
+    <input id="contactvalue" name="contact" required autocomplete="email" placeholder="Email or phone number" aria-label="Email or phone number" maxlength="180">
+    <button type="submit" id="contactCTA" class="decode-target" data-text="EMBRACE CHANGE">EMBRACE CHANGE</button>
     <div id="contactstatus" role="status"></div>
   </form>
-  <div class="note">Prototipo: i recapiti non vengono inviati né salvati. Il collegamento al servizio di contatto è da configurare.</div>
+  <div class="note">Prototype only: contact details are not sent or stored. Submission must be configured.</div>
 </section>
 <script>
 (()=>{
@@ -114,34 +124,46 @@ const distortCanvas=document.createElement('canvas'),distortCtx=distortCanvas.ge
 let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // The experience rests after twenty seconds without touch, independent of camera and motion.
 const IDLE_FADE_MS=20000;let lastTouch=performance.now(),idleBlack=0;
-let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, enteredAt=null, prevWord=-1, typingStart=0, lastTyped=-1;
-const words=['Sei','ancora','fermo','qui?','Tieni','premuto','per','5','secondi','e','cambierai','la','tua','visione.'];
-// Each word is built character by character three seconds after ENTRA.
-function glyphFor(char,i){
- const span=document.createElement('span');span.className='glyph';span.textContent=char;
- span.style.animationDelay=(i*34)+'ms';return span;
+let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, firstTouchAt=null, phraseStarted=false, phraseFinished=false, scrollOffset=0, scrollVelocity=0, lastPointerY=null;
+const messageLines=['STILL STANDING HERE?','HOLD FOR 5 SECONDS','AND CHANGE YOUR VISION.'];
+const messageText=messageLines.join('');
+const flapGlyphs=[];
+let lastFlapTick=-1;
+const glyphSet='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?#%';
+function setupFlap(){
+ const parent=$('statementWord');parent.replaceChildren();flapGlyphs.length=0;
+ messageLines.forEach((line,l)=>{
+  const row=document.createElement('span');row.className='flap-line';
+  for(const letter of line){
+   const span=document.createElement('span');span.className='flap-char'+(letter===' '?' space':'');
+   span.textContent=letter===' '?' ':'·';span.dataset.target=letter;
+   row.appendChild(span);flapGlyphs.push(span);
+  }
+  parent.appendChild(row);
+ });
 }
-function setTyped(element,word,visible,reset){
- if(reset){element.replaceChildren();element.dataset.typed='0'}
- const prior=Number(element.dataset.typed||0);
- const cursor=element.querySelector('.cursor');if(cursor)cursor.remove();
- for(let i=prior;i<Math.min(visible,word.length);i++)element.appendChild(glyphFor(word[i],i));
- element.dataset.typed=String(visible);
- if(visible<word.length){const next=document.createElement('span');next.className='cursor';element.appendChild(next)}
-}
-function changeWord(now){
- if(enteredAt===null||now-enteredAt<3000)return;
- const elapsed=now-enteredAt-3000;
- const slot=Math.floor(elapsed/2000),i=slot%words.length;
- const word=words[i],local=elapsed%2000;
- const visible=Math.min(word.length,Math.floor(local/95)+1);
- if(i!==prevWord||visible!==lastTyped){
-  const isNewWord=i!==prevWord;prevWord=i;lastTyped=visible;
-  const t=$('statementWord');
-  setTyped(t,word,visible,isNewWord);
-  t.style.transform='skewX('+(((i*13)%17)-8)+'deg) scaleX('+(i%3===0?.87:1.04)+')';
-  t.style.opacity=(local>1690?Math.max(.05,(2000-local)/310):1);
+function runFlap(now){
+ if(firstTouchAt===null||now-firstTouchAt<45000)return;
+ if(!phraseStarted){phraseStarted=true;setupFlap();markInteraction();$('statement').classList.add('show')}
+ const elapsed=now-firstTouchAt-45000;
+ const total=6000;
+ if(elapsed>=total){
+  if(!phraseFinished){phraseFinished=true;flapGlyphs.forEach(span=>{span.textContent=span.dataset.target;span.classList.remove('active');span.classList.add('locked');span.style.setProperty('--flip','0deg')})}
+  return;
  }
+ const tick=Math.floor(elapsed/95);if(tick===lastFlapTick)return;lastFlapTick=tick;
+ const count=flapGlyphs.length;
+ const progress=elapsed/total;
+ // Each individual cell settles in sequence. Earlier cells stay locked.
+ flapGlyphs.forEach((span,i)=>{
+  const settleAt=.12+.84*(i/Math.max(1,count-1));
+  if(span.dataset.target===' '){span.textContent=' ';span.classList.add('locked');return}
+  if(progress>=settleAt){span.textContent=span.dataset.target;span.classList.remove('active');span.classList.add('locked');span.style.setProperty('--flip','0deg')}
+  else if(progress>=Math.max(0,settleAt-.21)){
+   const n=(i*17+tick*13)%glyphSet.length;
+   span.textContent=glyphSet[n];span.classList.add('active');span.style.setProperty('--flip',(tick%2===0?-16:19)+'deg');
+  }else{span.textContent=' ';span.classList.remove('active')}
+ });
 }
 function animateFinalText(){
  const targets=[$('contactTitle'),$('contactCTA')];
@@ -172,9 +194,9 @@ function completeJourney(){
 $('contactform').addEventListener('submit',async ev=>{
  ev.preventDefault();
  const value=$('contactvalue').value.trim(),valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)||/^\+?[\d\s().-]{6,22}$/.test(value);
- if(!valid){$('contactstatus').textContent='Inserisci un indirizzo email o un telefono valido.';return}
- try{await navigator.clipboard.writeText(value);$('contactstatus').textContent='Recapito copiato. Invio non ancora configurato.'}
- catch{$('contactstatus').textContent='Invio non ancora configurato. Nessun dato è stato salvato.'}
+ if(!valid){$('contactstatus').textContent='Enter a valid email or phone number.';return}
+ try{await navigator.clipboard.writeText(value);$('contactstatus').textContent='Contact copied. Submission is not configured yet.'}
+ catch{$('contactstatus').textContent='Submission is not configured. No data was stored.'}
 });
 function markInteraction(){lastTouch=performance.now()}
 
@@ -193,9 +215,9 @@ async function toggleCamera(){markInteraction();if(cameraBusy)return;if(cameraAc
 $('camera').addEventListener('click',toggleCamera);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&cameraActive)stopCamera()});
 function sampleCamera(now){if(!cameraActive||!cameraCtx||now-lastCameraSample<130)return;lastCameraSample=now;if(cameraVideo.readyState<2)return;try{const vw=cameraVideo.videoWidth||320,vh=cameraVideo.videoHeight||240,ratio=Math.max(48/vw,72/vh),cw=48/ratio,ch=72/ratio;cameraCtx.drawImage(cameraVideo,(vw-cw)/2,(vh-ch)/2,cw,ch,0,0,48,72);const frameData=cameraCtx.getImageData(0,0,48,72),pixels=frameData.data;let sum=0;for(let i=0;i<pixels.length;i+=4){const r=pixels[i]/255,g=pixels[i+1]/255,b=pixels[i+2]/255;sum+=.2126*r*r+.7152*g*g+.0722*b*b;const gray=Math.round(.2126*pixels[i]+.7152*pixels[i+1]+.0722*pixels[i+2]);pixels[i]=gray;pixels[i+1]=gray;pixels[i+2]=gray}cameraCtx.putImageData(frameData,0,0);cameraLight=clamp(Math.sqrt(sum/(pixels.length/4)),0,1);cameraSamples++;lightLow=Math.min(cameraLight,lightLow);lightHigh=Math.max(cameraLight,lightHigh);$('lightvalue').textContent=Math.round(cameraLight*100)+'%';$('lightfill').style.width=Math.round(cameraLight*100)+'%';$('sensor').textContent='LIGHT / '+Math.round(cameraLight*100)+'%';cameraError=false}catch(e){if(!cameraError){cameraError=true;$('lightvalue').textContent='ERR';announce('LIGHT SENSOR ERROR')}}}
-$('enter').addEventListener('click',()=>{run=true;markInteraction();enteredAt=performance.now();scene=2;form=2;idleBlack=0;$('intro').classList.add('off');$('ui').classList.add('show');if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')$('motion').classList.add('show');else motion();if(!raf)raf=requestAnimationFrame(frame)});
-canvas.addEventListener('pointerdown',e=>{if(!run||completed)return;markInteraction();point={x:e.clientX/w,y:e.clientY/h};down={x:e.clientX,y:e.clientY,currentX:e.clientX,currentY:e.clientY,t:performance.now(),pointerId:e.pointerId};holding=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{holding=true;announce('HOLD / GRAVITY')},440);try{canvas.setPointerCapture(e.pointerId)}catch{}});
-canvas.addEventListener('pointermove',e=>{if(!run||completed)return;point={x:e.clientX/w,y:e.clientY/h};if(down&&e.pointerId===down.pointerId){markInteraction();down.currentX=e.clientX;down.currentY=e.clientY;holding=true;}});
+$('enter').addEventListener('click',()=>{run=true;markInteraction();scene=2;form=2;idleBlack=0;$('intro').classList.add('off');$('ui').classList.add('show');if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')$('motion').classList.add('show');else motion();if(!raf)raf=requestAnimationFrame(frame)});
+canvas.addEventListener('pointerdown',e=>{if(!run||completed)return;markInteraction();if(firstTouchAt===null)firstTouchAt=performance.now();point={x:e.clientX/w,y:e.clientY/h};lastPointerY=e.clientY;down={x:e.clientX,y:e.clientY,currentX:e.clientX,currentY:e.clientY,t:performance.now(),pointerId:e.pointerId};holding=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{holding=true;announce('HOLD / GRAVITY')},440);try{canvas.setPointerCapture(e.pointerId)}catch{}});
+canvas.addEventListener('pointermove',e=>{if(!run||completed)return;point={x:e.clientX/w,y:e.clientY/h};if(down&&e.pointerId===down.pointerId){markInteraction();const deltaY=e.clientY-down.currentY;scrollVelocity+=clamp(-deltaY*.004,-.13,.13);down.currentX=e.clientX;down.currentY=e.clientY;holding=true;}});
 function end(e){if(!down||completed)return;markInteraction();$('holdcount').classList.remove('show');clearTimeout(holdTimer);let dx=e.clientX-down.x,dy=e.clientY-down.y,d=Math.hypot(dx,dy);down=null;if(holding){holding=false;pulse=1.7;energy=1.25;announce('RELEASE');return}if(d>45){if(Math.abs(dx)>Math.abs(dy)){pulse=1.1;announce('MONOLITH')}else{depth=clamp(depth+(dy<0?.48:-.48),-1.5,1.5);pulse=1.25;announce(dy<0?'EXPAND':'COMPRESS')}}else{point={x:e.clientX/w,y:e.clientY/h};pulse=1.5;energy=.9;announce('IMPULSE')}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',()=>{down=null;holding=false;clearTimeout(holdTimer)});
 window.addEventListener('keydown',e=>{if(!run)return;markInteraction();if(e.key==='ArrowUp'||e.key==='ArrowDown'){depth+=e.key==='ArrowUp'?.4:-.4;pulse=1}if(e.key===' ')pulse=1.5});
@@ -210,10 +232,10 @@ for(let j=0;j<rows;j++){for(let i=0;i<cols;i++){
 let bx=x0+i*spacing,by=y0+j*spacing;
 const nx=(bx-tw)/reach,ny=(by-th)/reach;
 const radial=Math.sqrt(nx*nx+ny*ny),a=Math.atan2(ny,nx);
-const wave=Math.sin(radial*13.5-time*.83+Math.sin(a*2.4)*.85)*.5+.5;
-const folded=Math.sin(nx*10+Math.cos(ny*6+time*.32)*2.6)+Math.cos(ny*9.3-nx*5.5-time*.19);
-const mountain=Math.exp(-Math.pow((ny+.15*Math.sin(nx*5+time*.3)+nx*nx*.38)*2.1,2));
-const hollow=Math.exp(-Math.pow((nx-.24*Math.sin(ny*4-time*.36))*.95,2)-Math.pow((ny+.08)*1.8,2));
+const wave=Math.sin(radial*13.5-time*.83+scrollOffset+Math.sin(a*2.4)*.85)*.5+.5;
+const folded=Math.sin(nx*10+Math.cos(ny*6+time*.32+scrollOffset*.43)*2.6)+Math.cos(ny*9.3-nx*5.5-time*.19-scrollOffset);
+const mountain=Math.exp(-Math.pow((ny+.15*Math.sin(nx*5+time*.3+scrollOffset)+nx*nx*.38)*2.1,2));
+const hollow=Math.exp(-Math.pow((nx-.24*Math.sin(ny*4-time*.36+scrollOffset))*.95,2)-Math.pow((ny+.08)*1.8,2));
 const silver=clamp((.19+.34*folded+.65*mountain+.38*wave*.45)*(.72+.28*Math.cos(nx*2)),0,1);
 const glow=clamp(.65*mountain+.72*hollow+.1*wave,0,1);
 const dist=Math.hypot(bx-px,by-py),touch=Math.exp(-dist*dist/(w*w*.075));
@@ -222,7 +244,7 @@ const push=(holding?35:12*pulse)*touch;
 const dx=bx-(down?down.currentX:point.x*w),dy=by-(down?down.currentY:point.y*h);
 const rr=Math.hypot(dx,dy),angle=Math.atan2(dy,dx);
 const fluid=liquidForce*Math.exp(-rr*rr/(w*w*.30));
-const swirl=Math.sin(rr*.043-time*4.2)*fluid*34;
+const swirl=Math.sin(rr*.043-time*4.2)*fluid*63;
 let x=bx+nx*(deformation*18-push*.65)+Math.sin(ny*11+time*.28)*morph*4+Math.cos(angle+1.57)*swirl+fluid*Math.sin(dy*.028+time*2.1)*19;
 let y=by+ny*(deformation*29-push)+Math.cos(nx*9+time*.21)*morph*3+Math.sin(angle+1.57)*swirl+fluid*Math.cos(dx*.031-time*2.4)*23;
 const brightness=clamp((.1+.92*glow)*(1-morph)+silver*morph+touch*pulse*.27,0,1);
@@ -250,9 +272,11 @@ function frame(now){raf=requestAnimationFrame(frame);let dt=Math.min(.045,(now-l
   }
   if(held>=6000){completeJourney();return}
  }else{liquidForce=lerp(liquidForce,0,Math.min(1,dt*3))}
- if(enteredAt!==null&&now-enteredAt>=3000)$('statement').classList.add('show');
- changeWord(now);
+ runFlap(now);
  $('statement').style.transform=liquidForce>.001?'translate('+Math.sin(time*4)*liquidForce*7+'px,'+Math.cos(time*3)*liquidForce*5+'px) skewX('+Math.sin(time*4)*liquidForce*4+'deg)':'none';
+// Keep the 45-second wait and six-second message reveal visible before idling.
+const awaitingMessage=firstTouchAt!==null&&!phraseFinished;
+if(awaitingMessage)lastTouch=performance.now();
 const idleElapsed=Math.max(0,performance.now()-lastTouch);
 const idleProgress=clamp(idleElapsed/IDLE_FADE_MS,0,1);
 const eased=idleProgress*idleProgress*(3-2*idleProgress);
@@ -261,8 +285,10 @@ idleBlack=lerp(idleBlack,eased,Math.min(1,dt*(eased<idleBlack?5:30)));
 $('ui').style.opacity=(1-idleBlack).toFixed(3);
 $('camera').style.opacity=(1-idleBlack).toFixed(3);
 $('lightmeter').style.opacity=(1-idleBlack).toFixed(3);
-if($('motion').classList.contains('show'))$('motion').style.opacity=(1-idleBlack).toFixed(3);$('statement').style.opacity=(1-idleBlack).toFixed(3);
-const cx=w*.5+tilt.x*w*.07,cy=h*.48+tilt.y*h*.06;
+if($('motion').classList.contains('show'))$('motion').style.opacity=(1-idleBlack).toFixed(3);$('statement').style.opacity=(phraseStarted?1-idleBlack:0).toFixed(3);
+// Endless seamless background scroll: only the material phase changes; UI and typography stay fixed.
+ scrollOffset+=scrollVelocity*dt*60;scrollVelocity*=Math.exp(-dt*4.2);
+ const cx=w*.5+tilt.x*w*.07,cy=h*.48+tilt.y*h*.06;
 background(cx,cy,form<.7);
 // Blurred monochrome camera backdrop below VOID's original digital material.
 // Camera frames stay local; grayscale and blur do not affect light sensing.
@@ -313,18 +339,27 @@ if(cameraActive&&cameraSamples>0){const normalized=clamp((filteredLight-.08)/.78
 // Refract the already-rendered scene locally so the camera, particles and orange streak bend together.
 if(liquidForce>.015&&down&&distortCtx){
  const centerX=down.currentX,centerY=down.currentY;
- const radius=Math.min(w*.46,190),left=Math.max(0,centerX-radius),right=Math.min(w,centerX+radius);
+ const radius=Math.min(w*.65,260),left=Math.max(0,centerX-radius),right=Math.min(w,centerX+radius);
  const top=Math.max(0,centerY-radius),bottom=Math.min(h,centerY+radius);
  distortCtx.setTransform(1,0,0,1,0,0);distortCtx.drawImage(canvas,0,0);
- ctx.save();ctx.globalAlpha=.90;
- const strip=7;
+ ctx.save();ctx.globalAlpha=.96;
+ const strip=5;
  for(let y=top;y<bottom;y+=strip){
   const height=Math.min(strip,bottom-y);
   const norm=(y+height*.5-centerY)/radius;
   const reach=Math.sqrt(Math.max(0,1-norm*norm));
-  const shift=Math.sin(norm*11-time*5)*liquidForce*17*reach;
+  const shift=(Math.sin(norm*15-time*6.5)*33+Math.sin(norm*27+time*3.5)*18)*liquidForce*reach;
   const sx=Math.max(0,left+shift),sw=Math.min(w-sx,right-left);
   if(sw>0)ctx.drawImage(distortCanvas,sx*dpr,y*dpr,sw*dpr,height*dpr,left,y,sw,height);
+ }
+ ctx.restore();
+ // Moving water lens: translucent concentric caustics centred on the finger.
+ ctx.save();ctx.globalCompositeOperation='screen';
+ for(let n=0;n<3;n++){
+ const rad=(28+n*48+time*26)%radius;
+ ctx.beginPath();ctx.ellipse(centerX,centerY,rad,rad*.78,Math.sin(time*.6)*.2,0,Math.PI*2);
+ ctx.strokeStyle='rgba(205,220,222,'+(liquidForce*(.105-n*.023)).toFixed(3)+')';
+ ctx.lineWidth=1.1;ctx.stroke();
  }
  ctx.restore();
 }
