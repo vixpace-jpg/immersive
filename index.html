@@ -170,7 +170,7 @@ const distortCanvas=document.createElement('canvas'),distortCtx=distortCanvas.ge
 let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // The experience rests after twenty seconds without touch, independent of camera and motion.
 const IDLE_FADE_MS=20000;let lastTouch=performance.now(),idleBlack=0;
-let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, enteredAt=null, phraseStarted=false, phraseFinished=false, scrollOffset=0, scrollVelocity=0, lastPointerY=null;
+let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, enteredAt=null, phraseStarted=false, phraseFinished=false, scrollOffset=0, scrollVelocity=0, lastPointerY=null, lastHapticAt=0;
 const messageLines=['STILL STANDING HERE?','HOLD FOR 5 SECONDS','AND CHANGE YOUR VISION.'];
 const messageText=messageLines.join('');
 const flapGlyphs=[];
@@ -334,6 +334,13 @@ function frame(now){raf=requestAnimationFrame(frame);let dt=Math.min(.045,(now-l
    counter.style.setProperty('--shake-y',shakeY.toFixed(2)+'px');
    number.style.setProperty('--shake-x',shakeX.toFixed(2)+'px');
    number.style.setProperty('--shake-y',shakeY.toFixed(2)+'px');
+   if(typeof navigator.vibrate==='function'&&held>350){
+    const gap=550-intensity*240+Math.sin(held*.013)*65;
+    if(now-lastHapticAt>gap){
+     lastHapticAt=now;
+     try{navigator.vibrate(Math.round(4+intensity*13))}catch{}
+    }
+   }
    if(held>=6000){completeJourney();return}
   }
  }else{liquidForce=lerp(liquidForce,0,Math.min(1,dt*3))}
