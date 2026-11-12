@@ -97,6 +97,11 @@
 #contact .mini,#contact .note{line-height:1.65}
 @media(prefers-reduced-motion:reduce){#statement .flap-char{transition:none}}
 
+/* VOID 010 — CTA must be visible even when decode animation is delayed */
+#contact.show #contactCTA,#contact #contactCTA.decode-target{
+ visibility:visible!important;opacity:1!important;display:block!important;
+ color:#070707!important;background:#efeee9!important;
+}
 /* VOID 009 — countdown number outside ring, sharp independently floating CTA */
 #holdcount{font-size:0!important}
 #holdnumber{position:fixed;z-index:9;display:none;pointer-events:none;transform:translate(-50%,-50%);font:700 29px/1 Arial,Helvetica,sans-serif;color:#f4f1ed;text-shadow:0 0 12px rgba(255,123,22,.45);font-variant-numeric:tabular-nums}
@@ -190,8 +195,11 @@ function animateFinalText(){
   }
  });
  button.textContent='EMBRACE CHANGE';
- button.classList.remove('decode-on');input.style.opacity='0';
- setTimeout(()=>{button.classList.add('decode-on');input.style.opacity='1'},1500);
+ button.classList.add('decode-on');
+ button.style.visibility='visible';
+ button.style.opacity='1';
+ input.style.opacity='0';
+ setTimeout(()=>{input.style.opacity='1'},1500);
 }
 function completeJourney(){
  if(completed)return;completed=true;down=null;holding=false;clearTimeout(holdTimer);
