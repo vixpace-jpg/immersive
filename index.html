@@ -271,7 +271,7 @@ $('contactform').addEventListener('submit',async ev=>{
  $('contact').classList.remove('show');
 });
 $('restart').addEventListener('click',()=>{window.location.reload()});
-$('contactvalue').addEventListener('input',()=>{$('contact').classList.toggle('typing',$('contactvalue').value.length>0)});
+$('contactvalue').addEventListener('input',()=>{if($('contactvalue').value.length>0)$('contact').classList.add('typing')});
 function markInteraction(){lastTouch=performance.now()}
 
 const cameraVideo=document.createElement('video');cameraVideo.muted=true;cameraVideo.playsInline=true;cameraVideo.setAttribute('playsinline','');const cameraCanvas=document.createElement('canvas');cameraCanvas.width=48;cameraCanvas.height=72;const cameraCtx=cameraCanvas.getContext('2d',{willReadFrequently:true});let cameraStream=null,cameraActive=false,cameraBusy=false,cameraLight=.5,filteredLight=.5,lastCameraSample=0,cameraSamples=0,cameraError=false,lightLow=1,lightHigh=0;
