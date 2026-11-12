@@ -1,0 +1,19 @@
+{
+  "name": "VOID — Immersive Journey",
+  "short_name": "VOID",
+  "description": "An immersive sensory experiment",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020305",
+  "theme_color": "#020305",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
