@@ -279,16 +279,31 @@
  letter-spacing:-.04em!important;
  text-shadow:none!important;
 }
+/* VOID 024 — refined two-line contact headline */
+#contact #contactTitle,
+#contact #contactTitle .glyph{
+ font-family:"Space Grotesk","Helvetica Neue",Arial,sans-serif!important;
+ font-weight:600!important;
+ font-synthesis:none!important;
+ letter-spacing:-.055em!important;
+ text-shadow:none!important;
+ -webkit-text-stroke:0!important;
+}
+#contact #contactTitle{
+ font-size:clamp(38px,10.5vw,76px)!important;
+ line-height:1.04!important;
+ margin-bottom:34px;
+}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
-<section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 023</div></section>
-<div class="ui" id="ui"><div class="head"><span>VOID — 023</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · TILT</div><div class="foot"><div><div class="phase" id="phase">vincenzopace</div><div class="phase-meta" id="descriptor">creative robeaccaso director</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
+<section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 024</div></section>
+<div class="ui" id="ui"><div class="head"><span>VOID — 024</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · TILT</div><div class="foot"><div><div class="phase" id="phase">vincenzopace</div><div class="phase-meta" id="descriptor">creative robeaccaso director</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
 <div id="prompt" role="status" aria-live="polite"></div><button id="motion">ENABLE MOTION</button><button id="camera" aria-pressed="false" title="Camera light modulates an abstract background; no images are saved">CAMERA / OFF</button><div id="lightmeter" aria-live="off"><div class="reading"><span>LIGHT</span><span id="lightvalue">--%</span></div><div class="track"><div class="fill" id="lightfill"></div></div></div>
 <div id="statement" aria-hidden="true"><span class="word" id="statementWord"></span></div>
 <div id="holdcount" aria-hidden="true"></div><div id="holdnumber" aria-live="off">5</div>
 <section id="contact" aria-label="Request a callback">
   <div class="mini">VOID / BEYOND THE SURFACE</div>
-  <h1 id="contactTitle" class="decode-target" data-text="A NEW VISION\nSTARTS HERE.">A NEW VISION<br>STARTS HERE.</h1>
+  <h1 id="contactTitle" class="decode-target" data-text="A NEW\nVISION">A NEW<br>VISION</h1>
   <form id="contactform">
     <input id="contactvalue" name="contact" required autocomplete="email" placeholder="Email or phone number" aria-label="Email or phone number" maxlength="180">
     <button type="submit" id="contactCTA" class="decode-target" data-text="EMBRACE CHANGE">EMBRACE CHANGE</button>
@@ -365,7 +380,7 @@ function animateFinalText(){
  // Preserve the English message and reveal the title without affecting button geometry.
  const title=$('contactTitle'),button=$('contactCTA'),input=$('contactvalue');
  title.replaceChildren();title.classList.add('decode-on');
- const lines=['A NEW VISION','STARTS HERE.'];
+ const lines=['A NEW','VISION'];
  let index=0;
  lines.forEach((line,i)=>{
   if(i)title.appendChild(document.createElement('br'));
