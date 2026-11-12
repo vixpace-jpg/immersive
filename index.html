@@ -123,6 +123,24 @@
 #statement .word::before,#statement .word::after{display:none!important}
 #statement .flap-char{opacity:1!important;color:#f2f0ea!important;visibility:visible!important}
 #statement .flap-char.active{color:#fff!important}
+
+/* VOID 013 — understated irregular ENTER pulse, tight split-flap type, growing tactile counter */
+.enter::after{animation:void-enter-flicker 7.8s linear infinite;will-change:opacity}
+@keyframes void-enter-flicker{
+ 0%,9%{opacity:.66}11%{opacity:.15}13%,25%{opacity:.82}
+ 29%,31%{opacity:.07}34%,45%{opacity:.55}49%{opacity:.12}
+ 54%,65%{opacity:.9}69%{opacity:.22}72%,83%{opacity:.58}
+ 88%,90%{opacity:.08}93%,100%{opacity:.72}
+}
+#statement .word{font-weight:900!important;letter-spacing:-.025em!important}
+#statement .flap-char{font-weight:900!important;letter-spacing:-.025em!important}
+#holdcount{transform:translate(calc(-50% + var(--shake-x,0px)),calc(-50% + var(--shake-y,0px)))!important;will-change:transform}
+#holdnumber{transform:translate(calc(-50% + var(--shake-x,0px)),calc(-50% + var(--shake-y,0px)))!important;will-change:transform}
+#ending{position:fixed;inset:0;z-index:25;display:none;place-items:center;background:#000;color:#f2f0ec;opacity:0;transition:opacity .65s ease}
+#ending.show{display:grid;opacity:1}
+#restart{border:0;background:transparent;color:inherit;font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:clamp(47px,13vw,115px);font-weight:900;line-height:1;letter-spacing:-.072em;text-align:center;cursor:pointer;padding:38px 16px;max-width:95vw}
+#restart:focus-visible{outline:1px solid #f2f0ec;outline-offset:12px}
+@media(prefers-reduced-motion:reduce){.enter::after{animation:none}#holdcount,#holdnumber{transform:translate(-50%,-50%)!important}}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
 <section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 002</div></section>
@@ -140,6 +158,7 @@
   </form>
   <div class="note">Prototype only: contact details are not sent or stored. Submission must be configured.</div>
 </section>
+<section id="ending" aria-label="Final screen"><button id="restart" type="button" aria-label="Return to ENTER">NOT TODAY</button></section>
 <script>
 (()=>{
 'use strict';
@@ -224,9 +243,12 @@ $('contactform').addEventListener('submit',async ev=>{
  ev.preventDefault();
  const value=$('contactvalue').value.trim(),valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)||/^\+?[\d\s().-]{6,22}$/.test(value);
  if(!valid){$('contactstatus').textContent='Enter a valid email or phone number.';return}
- try{await navigator.clipboard.writeText(value);$('contactstatus').textContent='Contact copied. Submission is not configured yet.'}
- catch{$('contactstatus').textContent='Submission is not configured. No data was stored.'}
+ // Prototype: do not claim submission, store the contact, or send network requests.
+ $('contactvalue').value='';
+ $('ending').classList.add('show');
+ $('contact').classList.remove('show');
 });
+$('restart').addEventListener('click',()=>{window.location.reload()});
 function markInteraction(){lastTouch=performance.now()}
 
 const cameraVideo=document.createElement('video');cameraVideo.muted=true;cameraVideo.playsInline=true;cameraVideo.setAttribute('playsinline','');const cameraCanvas=document.createElement('canvas');cameraCanvas.width=48;cameraCanvas.height=72;const cameraCtx=cameraCanvas.getContext('2d',{willReadFrequently:true});let cameraStream=null,cameraActive=false,cameraBusy=false,cameraLight=.5,filteredLight=.5,lastCameraSample=0,cameraSamples=0,cameraError=false,lightLow=1,lightHigh=0;
@@ -304,6 +326,14 @@ function frame(now){raf=requestAnimationFrame(frame);let dt=Math.min(.045,(now-l
    number.style.left=ringX+'px';
    number.style.top=(ringY>=123?ringY-76:ringY+76)+'px';
    number.textContent=String(Math.max(0,5-Math.floor(held/1000)));
+   // Irregular, progressively stronger visual tremor; on supported devices add brief haptic pulses.
+   const intensity=Math.min(1,held/6000),amplitude=Math.pow(intensity,1.6)*4.8;
+   const shakeX=amplitude*(Math.sin(now*.065)+Math.sin(now*.113)*.46);
+   const shakeY=amplitude*(Math.cos(now*.079)+Math.cos(now*.137)*.41);
+   counter.style.setProperty('--shake-x',shakeX.toFixed(2)+'px');
+   counter.style.setProperty('--shake-y',shakeY.toFixed(2)+'px');
+   number.style.setProperty('--shake-x',shakeX.toFixed(2)+'px');
+   number.style.setProperty('--shake-y',shakeY.toFixed(2)+'px');
    if(held>=6000){completeJourney();return}
   }
  }else{liquidForce=lerp(liquidForce,0,Math.min(1,dt*3))}
