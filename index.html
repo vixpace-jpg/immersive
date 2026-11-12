@@ -247,9 +247,9 @@ function setupFlap(){
  });
 }
 function runFlap(now){
- if(enteredAt===null||now-enteredAt<5000)return;
+ if(enteredAt===null||now-enteredAt<10000)return;
  if(!phraseStarted){phraseStarted=true;setupFlap();markInteraction();$('statement').classList.add('show');$('statement').style.visibility='visible'}
- const elapsed=now-enteredAt-5000;
+ const elapsed=now-enteredAt-10000;
  const total=6000;
  if(elapsed>=total){
   if(!phraseFinished){phraseFinished=true;flapGlyphs.forEach(span=>{span.textContent=span.dataset.target;span.classList.remove('active');span.classList.add('locked');span.style.setProperty('--flip','0deg')})}
