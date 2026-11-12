@@ -67,13 +67,20 @@
 #contact #contactvalue:focus{animation:none;transform:none;will-change:auto}
 #contact #contactCTA:active{animation-play-state:paused}
 @media(prefers-reduced-motion:reduce){#contact #contactvalue,#contact #contactCTA{animation:none}#statement .glyph{animation:none}}
+
+/* VOID 006: single Monolith scene and touch-following countdown */
+#holdcount{width:82px;height:82px;border-radius:50%;display:none;align-items:center;justify-content:center;font:400 27px/1 ui-monospace,monospace;letter-spacing:-.055em;transform:translate(-50%,-50%);color:#fff;border:1px solid rgba(255,255,255,.12);background:radial-gradient(circle,rgba(0,0,0,.89) 0%,rgba(0,0,0,.67) 55%,transparent 72%);box-shadow:0 0 28px rgba(0,0,0,.65);filter:none;isolation:isolate}
+#holdcount.show{display:flex}
+#holdcount::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -90deg,#ff781f var(--progress,0%),rgba(255,255,255,.17) var(--progress,0%));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));pointer-events:none}
+#holdcount::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(255,117,25,.19);pointer-events:none}
+#statement{transform-origin:center;will-change:transform}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
 <section id="intro"><button class="enter" id="enter">ENTRA</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 002</div></section>
-<div class="ui" id="ui"><div class="head"><span>VOID — 002</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · SWIPE · TILT</div><div class="foot"><div><div class="phase" id="phase">Aether</div><div class="phase-meta" id="descriptor">01 / ATMOSPHERE</div></div><div class="index" id="index">01 — 03</div></div><div class="progress"><i id="bar"></i></div></div>
+<div class="ui" id="ui"><div class="head"><span>VOID — 002</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · TILT</div><div class="foot"><div><div class="phase" id="phase">Monolith</div><div class="phase-meta" id="descriptor">SCULPTED MATTER</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
 <div id="prompt" role="status" aria-live="polite"></div><button id="motion">ABILITA MOVIMENTO</button><button id="camera" aria-pressed="false" title="La fotocamera modula la luce e crea uno sfondo astratto, senza salvare immagini">CAMERA / OFF</button><div id="lightmeter" aria-live="off"><div class="reading"><span>LIGHT</span><span id="lightvalue">--%</span></div><div class="track"><div class="fill" id="lightfill"></div></div></div>
 <div id="statement" aria-hidden="true"><span class="word" id="statementWord"></span></div>
-<div id="holdcount" aria-live="off"></div>
+<div id="holdcount" aria-live="off"><span id="holdnumber">5</span></div>
 <section id="contact" aria-label="Richiedi un contatto">
   <div class="mini">VOID / BEYOND THE SURFACE</div>
   <h1 id="contactTitle" class="decode-target" data-text="LA TUA VISIONE\nINIZIA QUI.">LA TUA VISIONE<br>INIZIA QUI.</h1>
@@ -89,14 +96,15 @@
 'use strict';
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});if(!ctx)return;
 const names=['Aether','Lattice','Monolith'],labels=['ATMOSPHERE','PARTICLE FIELD','SCULPTED MATTER'];
-let w=1,h=1,dpr=1,run=false,scene=0,form=0,time=0,last=0,energy=0,pulse=0,depth=0,drag={x:0,y:0},tilt={x:0,y:0},target={x:0,y:0},point={x:.5,y:.5},down=null,holding=false,holdTimer=0,motionActive=false,messageTimer=0,raf=0;
+let w=1,h=1,dpr=1,run=false,scene=2,form=2,time=0,last=0,energy=0,pulse=0,depth=0,drag={x:0,y:0},tilt={x:0,y:0},target={x:0,y:0},point={x:.5,y:.5},down=null,holding=false,holdTimer=0,motionActive=false,messageTimer=0,raf=0;
 let noiseCanvas=document.createElement('canvas'),grain=noiseCanvas.getContext('2d');
+const distortCanvas=document.createElement('canvas'),distortCtx=distortCanvas.getContext('2d',{alpha:false});
 let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // The experience rests after twenty seconds without touch, independent of camera and motion.
 const IDLE_FADE_MS=20000;let lastTouch=performance.now(),idleBlack=0;
-let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, firstTouchAt=null, prevWord=-1, typingStart=0, lastTyped=-1;
+let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, enteredAt=null, prevWord=-1, typingStart=0, lastTyped=-1;
 const words=['Sei','ancora','fermo','qui?','Tieni','premuto','per','5','secondi','e','cambierai','la','tua','visione.'];
-// Each word is built character by character only after ten seconds from first canvas touch.
+// Each word is built character by character three seconds after ENTRA.
 function glyphFor(char,i){
  const span=document.createElement('span');span.className='glyph';span.textContent=char;
  span.style.animationDelay=(i*34)+'ms';
@@ -116,8 +124,8 @@ function setTyped(element,word,visible,reset){
  if(visible<word.length){const next=document.createElement('span');next.className='cursor';element.appendChild(next)}
 }
 function changeWord(now){
- if(firstTouchAt===null||now-firstTouchAt<10000)return;
- const elapsed=now-firstTouchAt-10000;
+ if(enteredAt===null||now-enteredAt<3000)return;
+ const elapsed=now-enteredAt-3000;
  const slot=Math.floor(elapsed/2000),i=slot%words.length;
  const word=words[i],local=elapsed%2000;
  const visible=Math.min(word.length,Math.floor(local/95)+1);
@@ -167,10 +175,10 @@ function markInteraction(){lastTouch=performance.now()}
 const cameraVideo=document.createElement('video');cameraVideo.muted=true;cameraVideo.playsInline=true;cameraVideo.setAttribute('playsinline','');const cameraCanvas=document.createElement('canvas');cameraCanvas.width=48;cameraCanvas.height=72;const cameraCtx=cameraCanvas.getContext('2d',{willReadFrequently:true});let cameraStream=null,cameraActive=false,cameraBusy=false,cameraLight=.5,filteredLight=.5,lastCameraSample=0,cameraSamples=0,cameraError=false,lightLow=1,lightHigh=0;
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
 function lerp(a,b,s){return a+(b-a)*s}
-function resize(){w=window.innerWidth;h=window.innerHeight;dpr=Math.min(devicePixelRatio||1,Math.max(1,Math.sqrt(1700000/(w*h))));canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);noiseCanvas.width=192;noiseCanvas.height=336;const img=grain.createImageData(192,336);for(let i=0;i<img.data.length;i+=4){const v=Math.floor(Math.random()*255);img.data[i]=v;img.data[i+1]=v;img.data[i+2]=v;img.data[i+3]=Math.floor(Math.random()*92)}grain.putImageData(img,0,0)}
+function resize(){w=window.innerWidth;h=window.innerHeight;dpr=Math.min(devicePixelRatio||1,Math.max(1,Math.sqrt(1700000/(w*h))));canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);distortCanvas.width=canvas.width;distortCanvas.height=canvas.height;noiseCanvas.width=192;noiseCanvas.height=336;const img=grain.createImageData(192,336);for(let i=0;i<img.data.length;i+=4){const v=Math.floor(Math.random()*255);img.data[i]=v;img.data[i+1]=v;img.data[i+2]=v;img.data[i+3]=Math.floor(Math.random()*92)}grain.putImageData(img,0,0)}
 window.addEventListener('resize',resize,{passive:true});resize();
 function announce(s){$('prompt').textContent=s;$('prompt').classList.add('show');clearTimeout(messageTimer);messageTimer=setTimeout(()=>$('prompt').classList.remove('show'),850)}
-function choose(n){if(completed)return;markInteraction();scene=(n+3)%3;$('phase').textContent=names[scene];$('descriptor').textContent='0'+(scene+1)+' / '+labels[scene];$('index').textContent='0'+(scene+1)+' — 03';$('bar').style.transform='translateX('+(scene*100)+'%)';pulse=1;announce(names[scene].toUpperCase())}
+function choose(n){/* Single approved Monolith scene — swiping does not switch scenes. */}
 function orientation(e){if(e.gamma==null||e.beta==null)return;target.x=clamp(e.gamma/32,-1,1);target.y=clamp((e.beta-35)/46,-1,1);$('sensor').textContent='MOTION / ACTIVE'}
 async function motion(){markInteraction();try{if(!window.DeviceOrientationEvent){$('sensor').textContent='MOTION / UNAVAILABLE';return}if(typeof DeviceOrientationEvent.requestPermission==='function'){let r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){$('sensor').textContent='MOTION / OFF';return}}window.addEventListener('deviceorientation',orientation,{passive:true});motionActive=true;$('motion').classList.remove('show')}catch{$('sensor').textContent='MOTION / UNAVAILABLE'}}
 $('motion').addEventListener('click',motion);
@@ -179,12 +187,12 @@ async function toggleCamera(){markInteraction();if(cameraBusy)return;if(cameraAc
 $('camera').addEventListener('click',toggleCamera);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&cameraActive)stopCamera()});
 function sampleCamera(now){if(!cameraActive||!cameraCtx||now-lastCameraSample<130)return;lastCameraSample=now;if(cameraVideo.readyState<2)return;try{const vw=cameraVideo.videoWidth||320,vh=cameraVideo.videoHeight||240,ratio=Math.max(48/vw,72/vh),cw=48/ratio,ch=72/ratio;cameraCtx.drawImage(cameraVideo,(vw-cw)/2,(vh-ch)/2,cw,ch,0,0,48,72);const frameData=cameraCtx.getImageData(0,0,48,72),pixels=frameData.data;let sum=0;for(let i=0;i<pixels.length;i+=4){const r=pixels[i]/255,g=pixels[i+1]/255,b=pixels[i+2]/255;sum+=.2126*r*r+.7152*g*g+.0722*b*b;const gray=Math.round(.2126*pixels[i]+.7152*pixels[i+1]+.0722*pixels[i+2]);pixels[i]=gray;pixels[i+1]=gray;pixels[i+2]=gray}cameraCtx.putImageData(frameData,0,0);cameraLight=clamp(Math.sqrt(sum/(pixels.length/4)),0,1);cameraSamples++;lightLow=Math.min(cameraLight,lightLow);lightHigh=Math.max(cameraLight,lightHigh);$('lightvalue').textContent=Math.round(cameraLight*100)+'%';$('lightfill').style.width=Math.round(cameraLight*100)+'%';$('sensor').textContent='LIGHT / '+Math.round(cameraLight*100)+'%';cameraError=false}catch(e){if(!cameraError){cameraError=true;$('lightvalue').textContent='ERR';announce('LIGHT SENSOR ERROR')}}}
-$('enter').addEventListener('click',()=>{run=true;markInteraction();idleBlack=0;$('intro').classList.add('off');$('ui').classList.add('show');if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')$('motion').classList.add('show');else motion();if(!raf)raf=requestAnimationFrame(frame)});
-canvas.addEventListener('pointerdown',e=>{if(!run||completed)return;markInteraction();if(firstTouchAt===null){firstTouchAt=performance.now();$('statement').classList.add('show')}point={x:e.clientX/w,y:e.clientY/h};down={x:e.clientX,y:e.clientY,t:performance.now()};holding=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{holding=true;announce('HOLD / GRAVITY')},440);try{canvas.setPointerCapture(e.pointerId)}catch{}});
-canvas.addEventListener('pointermove',e=>{if(!run||completed)return;point={x:e.clientX/w,y:e.clientY/h};if(down){markInteraction();const dx=e.clientX-down.x,dy=e.clientY-down.y;if(Math.hypot(dx,dy)>16){clearTimeout(holdTimer);if(!holding){drag.x=clamp(dx/w,-1,1);drag.y=clamp(dy/h,-1,1)}}}});
-function end(e){if(!down||completed)return;markInteraction();$('holdcount').classList.remove('show');clearTimeout(holdTimer);let dx=e.clientX-down.x,dy=e.clientY-down.y,d=Math.hypot(dx,dy);down=null;if(holding){holding=false;pulse=1.7;energy=1.25;announce('RELEASE');return}if(d>45){if(Math.abs(dx)>Math.abs(dy)){choose(scene+(dx<0?1:-1))}else{depth=clamp(depth+(dy<0?.48:-.48),-1.5,1.5);pulse=1.25;announce(dy<0?'EXPAND':'COMPRESS')}}else{point={x:e.clientX/w,y:e.clientY/h};pulse=1.5;energy=.9;announce('IMPULSE')}}
+$('enter').addEventListener('click',()=>{run=true;markInteraction();enteredAt=performance.now();scene=2;form=2;idleBlack=0;$('intro').classList.add('off');$('ui').classList.add('show');if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')$('motion').classList.add('show');else motion();if(!raf)raf=requestAnimationFrame(frame)});
+canvas.addEventListener('pointerdown',e=>{if(!run||completed)return;markInteraction();point={x:e.clientX/w,y:e.clientY/h};down={x:e.clientX,y:e.clientY,currentX:e.clientX,currentY:e.clientY,t:performance.now(),pointerId:e.pointerId};holding=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{holding=true;announce('HOLD / GRAVITY')},440);try{canvas.setPointerCapture(e.pointerId)}catch{}});
+canvas.addEventListener('pointermove',e=>{if(!run||completed)return;point={x:e.clientX/w,y:e.clientY/h};if(down&&e.pointerId===down.pointerId){markInteraction();down.currentX=e.clientX;down.currentY=e.clientY;holding=true;}});
+function end(e){if(!down||completed)return;markInteraction();$('holdcount').classList.remove('show');clearTimeout(holdTimer);let dx=e.clientX-down.x,dy=e.clientY-down.y,d=Math.hypot(dx,dy);down=null;if(holding){holding=false;pulse=1.7;energy=1.25;announce('RELEASE');return}if(d>45){if(Math.abs(dx)>Math.abs(dy)){pulse=1.1;announce('MONOLITH')}else{depth=clamp(depth+(dy<0?.48:-.48),-1.5,1.5);pulse=1.25;announce(dy<0?'EXPAND':'COMPRESS')}}else{point={x:e.clientX/w,y:e.clientY/h};pulse=1.5;energy=.9;announce('IMPULSE')}}
 canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',()=>{down=null;holding=false;clearTimeout(holdTimer)});
-window.addEventListener('keydown',e=>{if(!run)return;markInteraction();if(e.key==='ArrowRight')choose(scene+1);if(e.key==='ArrowLeft')choose(scene-1);if(e.key==='ArrowUp'||e.key==='ArrowDown'){depth+=e.key==='ArrowUp'?.4:-.4;pulse=1}if(e.key===' ')pulse=1.5});
+window.addEventListener('keydown',e=>{if(!run)return;markInteraction();if(e.key==='ArrowUp'||e.key==='ArrowDown'){depth+=e.key==='ArrowUp'?.4:-.4;pulse=1}if(e.key===' ')pulse=1.5});
 document.addEventListener('visibilitychange',()=>{last=0});
 function background(cx,cy,atmosphere){ctx.fillStyle='#020202';ctx.fillRect(0,0,w,h);const radius=Math.max(w,h)*.79;let g=ctx.createRadialGradient(cx,cy,.01,cx,cy,radius);g.addColorStop(0,atmosphere>0.5?'#171512':'#121518');g.addColorStop(.32,'#090909');g.addColorStop(1,'#010101');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}
 function field(morph,dt){
@@ -205,7 +213,7 @@ const glow=clamp(.65*mountain+.72*hollow+.1*wave,0,1);
 const dist=Math.hypot(bx-px,by-py),touch=Math.exp(-dist*dist/(w*w*.075));
 const deformation=(folded*.26+mountain*1.7+hollow*.5)*morph;
 const push=(holding?35:12*pulse)*touch;
-const dx=bx-(down?down.x:point.x*w),dy=by-(down?down.y:point.y*h);
+const dx=bx-(down?down.currentX:point.x*w),dy=by-(down?down.currentY:point.y*h);
 const rr=Math.hypot(dx,dy),angle=Math.atan2(dy,dx);
 const fluid=liquidForce*Math.exp(-rr*rr/(w*w*.30));
 const swirl=Math.sin(rr*.043-time*4.2)*fluid*34;
@@ -223,19 +231,22 @@ const cx=w*.47+tilt.x*38,cy=h*.41+tilt.y*47,spread=w*.98;
 ctx.save();ctx.globalCompositeOperation='screen';
 for(let k=0;k<5;k++){const xx=cx+Math.sin(time*.13+k*1.51)*w*.35,yy=cy+Math.cos(time*.11+k*.83)*h*.22;let r=spread*(.65+k*.10);let g=ctx.createRadialGradient(xx,yy,0,xx,yy,r);let op=(.10+.05*Math.sin(time*.25+k));g.addColorStop(0,'rgba(217,205,188,'+op+')');g.addColorStop(.38,'rgba(115,113,111,'+(op*.27)+')');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}ctx.restore()}
 function frame(now){raf=requestAnimationFrame(frame);let dt=Math.min(.045,(now-last||16)/1000);last=now;if(!run||completed)return;time+=dt*(reduced?.25:1);sampleCamera(now);filteredLight=lerp(filteredLight,cameraActive?cameraLight:.5,Math.min(1,dt*2.3));form=lerp(form,scene,Math.min(1,dt*2));tilt.x=lerp(tilt.x,target.x,Math.min(1,dt*3));tilt.y=lerp(tilt.y,target.y,Math.min(1,dt*3));drag.x*=Math.exp(-dt*1.7);drag.y*=Math.exp(-dt*1.7);pulse*=Math.exp(-dt*2.9);energy=lerp(energy,holding?2.0:0,Math.min(1,dt*2.8));depth*=Math.exp(-dt*.42);
-// Countdown stays above the original touch point; transition after 6 full seconds.
+// Ring follows the active pointer; uninterrupted hold lasts six seconds even while moving.
  if(down){
   const held=performance.now()-down.t;
   liquidForce=lerp(liquidForce,clamp(held/1900,0,1),Math.min(1,dt*8));
   if(held>=500){
    const counter=$('holdcount');counter.classList.add('show');
-   counter.style.left=clamp(down.x,36,w-36)+'px';
-   counter.style.top=clamp(down.y-35,82,h-45)+'px';
-   counter.textContent=String(Math.max(0,5-Math.floor(held/1000)));
+   counter.style.left=clamp(down.currentX,48,w-48)+'px';
+   counter.style.top=clamp(down.currentY,48,h-48)+'px';
+   counter.style.setProperty('--progress',Math.min(100,held/5000*100).toFixed(1)+'%');
+   $('holdnumber').textContent=String(Math.max(0,5-Math.floor(held/1000)));
   }
   if(held>=6000){completeJourney();return}
  }else{liquidForce=lerp(liquidForce,0,Math.min(1,dt*3))}
+ if(enteredAt!==null&&now-enteredAt>=3000)$('statement').classList.add('show');
  changeWord(now);
+ $('statement').style.transform=liquidForce>.001?'translate('+Math.sin(time*4)*liquidForce*7+'px,'+Math.cos(time*3)*liquidForce*5+'px) skewX('+Math.sin(time*4)*liquidForce*4+'deg)':'none';
 const idleElapsed=Math.max(0,performance.now()-lastTouch);
 const idleProgress=clamp(idleElapsed/IDLE_FADE_MS,0,1);
 const eased=idleProgress*idleProgress*(3-2*idleProgress);
@@ -251,11 +262,11 @@ background(cx,cy,form<.7);
 // Camera frames stay local; grayscale and blur do not affect light sensing.
 if(cameraActive&&cameraSamples>0){
   ctx.save();
-  ctx.globalAlpha=.88;
-  ctx.filter='blur(11px)';
+  ctx.globalAlpha=.64;
+  ctx.filter='blur(13px)';
   ctx.drawImage(cameraCanvas,-16,-16,w+32,h+32);
   ctx.restore();
-  ctx.fillStyle='rgba(0,0,0,.42)';
+  ctx.fillStyle='rgba(0,0,0,.77)';
   ctx.fillRect(0,0,w,h);
 }
 if(form<1.15){ctx.save();ctx.globalAlpha=clamp(1-form*.6,0,1);atmosphere();ctx.restore()}
@@ -292,7 +303,25 @@ if(trailStarted>=0){
 ctx.save();ctx.globalAlpha=.06+(scene===0?.07:.018);ctx.imageSmoothingEnabled=true;ctx.drawImage(noiseCanvas,0,0,w,h);ctx.restore();
 let vignette=ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*.2,w/2,h/2,Math.max(w,h)*.82);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,0,0,.83)');ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
 // Camera modulates exposure in addition to the abstract live background; pixels remain local.
-if(cameraActive&&cameraSamples>0){const normalized=clamp((filteredLight-.08)/.78,0,1);const delta=normalized-.5;if(delta>0){const strength=Math.pow(delta*2,1.25);const g=ctx.createRadialGradient(w*.5,h*.46,0,w*.5,h*.46,Math.max(w,h)*.78);g.addColorStop(0,'rgba(233,226,215,'+(strength*.48).toFixed(3)+')');g.addColorStop(.55,'rgba(171,166,158,'+(strength*.25).toFixed(3)+')');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}else{ctx.fillStyle='rgba(0,0,0,'+(Math.pow(-delta*2,1.2)*.30).toFixed(3)+')';ctx.fillRect(0,0,w,h)}}
+if(cameraActive&&cameraSamples>0){const normalized=clamp((filteredLight-.08)/.78,0,1);const delta=normalized-.5;if(delta>0){const strength=Math.pow(delta*2,1.25);const g=ctx.createRadialGradient(w*.5,h*.46,0,w*.5,h*.46,Math.max(w,h)*.78);g.addColorStop(0,'rgba(233,226,215,'+(strength*.12).toFixed(3)+')');g.addColorStop(.55,'rgba(171,166,158,'+(strength*.06).toFixed(3)+')');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}else{ctx.fillStyle='rgba(0,0,0,'+(Math.pow(-delta*2,1.2)*.30).toFixed(3)+')';ctx.fillRect(0,0,w,h)}}
+// Refract the already-rendered scene locally so the camera, particles and orange streak bend together.
+if(liquidForce>.015&&down&&distortCtx){
+ const centerX=down.currentX,centerY=down.currentY;
+ const radius=Math.min(w*.46,190),left=Math.max(0,centerX-radius),right=Math.min(w,centerX+radius);
+ const top=Math.max(0,centerY-radius),bottom=Math.min(h,centerY+radius);
+ distortCtx.setTransform(1,0,0,1,0,0);distortCtx.drawImage(canvas,0,0);
+ ctx.save();ctx.globalAlpha=.90;
+ const strip=7;
+ for(let y=top;y<bottom;y+=strip){
+  const height=Math.min(strip,bottom-y);
+  const norm=(y+height*.5-centerY)/radius;
+  const reach=Math.sqrt(Math.max(0,1-norm*norm));
+  const shift=Math.sin(norm*11-time*5)*liquidForce*17*reach;
+  const sx=Math.max(0,left+shift),sw=Math.min(w-sx,right-left);
+  if(sw>0)ctx.drawImage(distortCanvas,sx*dpr,y*dpr,sw*dpr,height*dpr,left,y,sw,height);
+ }
+ ctx.restore();
+}
 if(idleBlack>0.001){ctx.fillStyle='rgba(0,0,0,'+idleBlack.toFixed(4)+')';ctx.fillRect(0,0,w,h)}
 }
 })();
