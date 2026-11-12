@@ -89,29 +89,16 @@ $('lightmeter').style.opacity=(1-idleBlack).toFixed(3);
 if($('motion').classList.contains('show'))$('motion').style.opacity=(1-idleBlack).toFixed(3);
 const cx=w*.5+tilt.x*w*.07,cy=h*.48+tilt.y*h*.06;
 background(cx,cy,form<.7);
-// Dark live glassmorphism layer below VOID's original digital material.
-// The same tiny local camera buffer drives the light meter; no image is stored or uploaded.
+// Blurred monochrome camera backdrop below VOID's original digital material.
+// Camera frames stay local; grayscale and blur do not affect light sensing.
 if(cameraActive&&cameraSamples>0){
-  // Dark frosted glass: real scene shapes, mild diffusion and restrained refraction.
-  ctx.save();ctx.globalAlpha=.94;ctx.filter='blur(3px)';
-  ctx.drawImage(cameraCanvas,-6,-6,w+12,h+12);ctx.restore();
-  // Refracted horizontal bands, intentionally subtle to retain recognizable silhouettes.
-  ctx.save();ctx.globalAlpha=.30;
-  const bands=15,sourceH=cameraCanvas.height/bands,bandH=h/bands;
-  for(let i=0;i<bands;i++){
-    const shift=Math.sin(i*1.67+time*.17)*Math.min(9,w*.022);
-    ctx.drawImage(cameraCanvas,0,i*sourceH,cameraCanvas.width,sourceH,shift,i*bandH,w,bandH+1);
-  }
+  ctx.save();
+  ctx.globalAlpha=.88;
+  ctx.filter='grayscale(100%) blur(11px) brightness(75%)';
+  ctx.drawImage(cameraCanvas,-16,-16,w+32,h+32);
   ctx.restore();
-  ctx.fillStyle='rgba(0,0,0,.40)';ctx.fillRect(0,0,w,h);
-  // Soft frosted reflections, with no visible glass pane borders or HUD.
-  ctx.save();let sheen=ctx.createLinearGradient(0,0,w,h);
-  sheen.addColorStop(0,'rgba(235,242,250,.115)');
-  sheen.addColorStop(.22,'rgba(197,204,216,.025)');
-  sheen.addColorStop(.48,'rgba(0,0,0,0)');
-  sheen.addColorStop(.77,'rgba(210,221,236,.028)');
-  sheen.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=sheen;ctx.fillRect(0,0,w,h);ctx.restore();
+  ctx.fillStyle='rgba(0,0,0,.42)';
+  ctx.fillRect(0,0,w,h);
 }
 if(form<1.15){ctx.save();ctx.globalAlpha=clamp(1-form*.6,0,1);atmosphere();ctx.restore()}
 const opacity=clamp(.24+form*.56,0,1);
