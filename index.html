@@ -115,6 +115,14 @@
 /* VOID 011 — centered contact field */
 #contact #contactvalue{text-align:center!important}
 #contact #contactvalue::placeholder{text-align:center;color:rgba(232,231,226,.7)}
+
+/* VOID 012 — reliable, visible 5-second split-flap reveal */
+#statement{z-index:7!important;opacity:0;visibility:hidden;transition:opacity .32s ease,visibility 0s linear .32s}
+#statement.show{visibility:visible;transition:opacity .32s ease,visibility 0s;opacity:1}
+#statement .word{color:#f2f0ea!important;mix-blend-mode:normal!important;filter:none!important;text-shadow:0 2px 12px rgba(0,0,0,.7)!important;opacity:1!important}
+#statement .word::before,#statement .word::after{display:none!important}
+#statement .flap-char{opacity:1!important;color:#f2f0ea!important;visibility:visible!important}
+#statement .flap-char.active{color:#fff!important}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
 <section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 002</div></section>
@@ -155,7 +163,7 @@ function setupFlap(){
   const row=document.createElement('span');row.className='flap-line';
   for(const letter of line){
    const span=document.createElement('span');span.className='flap-char'+(letter===' '?' space':'');
-   span.textContent=letter===' '?' ':'·';span.dataset.target=letter;
+   span.textContent=letter===' '?' ':glyphSet[(flapGlyphs.length*11+7)%glyphSet.length];span.dataset.target=letter;
    row.appendChild(span);flapGlyphs.push(span);
   }
   parent.appendChild(row);
@@ -163,7 +171,7 @@ function setupFlap(){
 }
 function runFlap(now){
  if(enteredAt===null||now-enteredAt<5000)return;
- if(!phraseStarted){phraseStarted=true;setupFlap();markInteraction();$('statement').classList.add('show')}
+ if(!phraseStarted){phraseStarted=true;setupFlap();markInteraction();$('statement').classList.add('show');$('statement').style.visibility='visible'}
  const elapsed=now-enteredAt-5000;
  const total=6000;
  if(elapsed>=total){
@@ -181,7 +189,7 @@ function runFlap(now){
   else if(progress>=Math.max(0,settleAt-.21)){
    const n=(i*17+tick*13)%glyphSet.length;
    span.textContent=glyphSet[n];span.classList.add('active');span.style.setProperty('--flip',(tick%2===0?-16:19)+'deg');
-  }else{span.textContent=' ';span.classList.remove('active')}
+  }else{span.textContent=glyphSet[(i*11+tick*7)%glyphSet.length];span.classList.add('active');span.style.setProperty('--flip',(tick%2?8:-8)+'deg')}
  });
 }
 function animateFinalText(){
@@ -311,7 +319,7 @@ idleBlack=lerp(idleBlack,eased,Math.min(1,dt*(eased<idleBlack?5:30)));
 $('ui').style.opacity=(1-idleBlack).toFixed(3);
 $('camera').style.opacity=(1-idleBlack).toFixed(3);
 $('lightmeter').style.opacity=(1-idleBlack).toFixed(3);
-if($('motion').classList.contains('show'))$('motion').style.opacity=(1-idleBlack).toFixed(3);$('statement').style.opacity=(phraseStarted?1-idleBlack:0).toFixed(3);
+if($('motion').classList.contains('show'))$('motion').style.opacity=(1-idleBlack).toFixed(3);$('statement').style.opacity=(phraseStarted?Math.max(0,1-idleBlack):0).toFixed(3);
 // Endless seamless background scroll: only the material phase changes; UI and typography stay fixed.
  /* seamless background scrolling suspended for testing; phase stays fixed. */
  const cx=w*.5+tilt.x*w*.07,cy=h*.48+tilt.y*h*.06;
