@@ -4,9 +4,6 @@
 <meta name="theme-color" content="#030303"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>VOID — Material Experience / 002</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#030303;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none}body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#e6e5e2}button{font:inherit}#world{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}#intro{position:fixed;inset:0;background:#020202;display:grid;place-items:center;z-index:6;transition:opacity 1.25s ease,visibility 1.25s}#intro.off{opacity:0;visibility:hidden;pointer-events:none}.enter{position:relative;border:none;background:transparent;color:#ededeb;padding:30px 34px;font-size:13px;font-weight:400;letter-spacing:.56em;text-indent:.56em;cursor:pointer}.enter:after{content:"";position:absolute;left:50%;bottom:20px;width:28px;height:1px;background:#777;transform:translateX(-50%);transition:width .7s}.enter:active:after{width:110px}.intro-meta{position:absolute;left:0;right:0;bottom:calc(48px + env(safe-area-inset-bottom));font:9px ui-monospace,monospace;letter-spacing:.22em;text-align:center;color:#545454}.ui{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity 1.5s;z-index:3}.ui.show{opacity:1}.head{position:absolute;left:28px;right:28px;top:calc(29px + env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center;font:10px ui-monospace,monospace;letter-spacing:.18em;color:#a1a19f}.head span:last-child{color:#666}.foot{position:absolute;bottom:calc(30px + env(safe-area-inset-bottom));left:28px;right:28px;display:flex;justify-content:space-between;align-items:end;gap:22px}.phase{font-size:clamp(28px,8vw,43px);font-weight:200;letter-spacing:-.055em;line-height:.95}.phase-meta{font:9px ui-monospace,monospace;letter-spacing:.12em;color:#8d8b87;margin-top:13px}.index{font:10px ui-monospace,monospace;letter-spacing:.13em;color:#777;white-space:nowrap}.side{position:absolute;right:24px;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;font:9px ui-monospace,monospace;letter-spacing:.23em;color:#777}.progress{position:absolute;left:28px;right:28px;bottom:calc(14px + env(safe-area-inset-bottom));height:1px;background:#2c2c2c}.progress i{display:block;width:33.333%;height:1px;background:#dedbd6;transition:transform 750ms cubic-bezier(.2,.75,.2,1)}#motion{position:fixed;z-index:5;left:50%;bottom:calc(112px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111c;color:#ddd;border:1px solid #555;padding:11px 16px;letter-spacing:.12em;font-size:9px;white-space:nowrap;display:none}#motion.show{display:block}#camera{position:fixed;z-index:5;right:27px;top:calc(62px + env(safe-area-inset-top));border:1px solid #555;background:rgba(5,5,5,.72);color:#d6d4d0;padding:10px 12px;letter-spacing:.12em;font:9px ui-monospace,monospace;cursor:pointer}#camera.active{border-color:#aaa;color:#fff}#camera:disabled{opacity:.45}#lightmeter{position:fixed;z-index:5;right:27px;top:calc(109px + env(safe-area-inset-top));width:110px;pointer-events:none;display:none}#lightmeter.show{display:block}#lightmeter .reading{font:10px ui-monospace,monospace;color:#ccc;letter-spacing:.08em;display:flex;justify-content:space-between;margin-bottom:6px}#lightmeter .track{height:2px;background:#454545}#lightmeter .fill{height:100%;width:0;background:#e0dcd5;transition:width .2s linear}#prompt{position:fixed;z-index:4;left:50%;top:55%;transform:translate(-50%,-50%);pointer-events:none;font:9px ui-monospace,monospace;letter-spacing:.3em;white-space:nowrap;color:#e9e5e0;opacity:0;transition:opacity .35s;text-shadow:0 1px 14px black}#prompt.show{opacity:.85}@media(max-width:360px){.head{left:20px;right:20px}.foot{left:20px;right:20px}.side{right:15px}}@media(prefers-reduced-motion:reduce){#intro,.ui,#prompt,.progress i{transition:none}}
 
@@ -47,27 +44,32 @@
 #contact input{transition:opacity .6s,border-color .3s}
 @media(prefers-reduced-motion:reduce){#statement .glyph,#contact .glyph{animation:none}}
 
-/* VOID 005 — brutalist deforming glyphs, unblurred CTA, independent levitation */
-#statement .word{font-family:"Rubik Glitch",Impact,"Arial Black",sans-serif;font-weight:400;font-size:clamp(49px,14vw,122px);letter-spacing:-.045em;line-height:1.13;max-width:95vw;overflow-wrap:normal;text-shadow:2px 0 rgba(255,255,255,.25),-3px 2px rgba(255,112,18,.13);filter:none!important}
-#statement .glyph{transform-origin:50% 60%;animation-name:amorph-reveal;animation-duration:.38s;animation-timing-function:steps(4,end);animation-fill-mode:both}
-@keyframes amorph-reveal{
- 0%{opacity:0;transform:translateY(-25px) rotate(20deg) skewX(-30deg) scale(.4,2.1);filter:blur(3px)}
- 35%{opacity:.9;transform:translateY(6px) rotate(-11deg) skewX(26deg) scale(1.3,.6);filter:none}
- 67%{opacity:.5;transform:translateY(-4px) rotate(7deg) skewX(-14deg) scale(.85,1.4)}
- 100%{opacity:1;transform:translateY(var(--rise,0px)) rotate(var(--rot,0deg)) skewX(var(--skew,0deg)) scaleX(var(--stretchx,1)) scaleY(var(--stretchy,1));filter:none}
-}
-#contact h1{font-family:"Rubik Glitch",Impact,sans-serif;font-weight:400}
+/* 004 kinetic digital typography */
+#statement .word{font-family:"Arial Narrow",Impact,system-ui,sans-serif;font-size:clamp(48px,15vw,126px);font-weight:900;letter-spacing:-.075em;line-height:1.05;text-shadow:1px 0 rgba(255,255,255,.27),-3px 0 rgba(150,150,150,.17);min-height:1.1em;transform:none;filter:none;transition:none}
+#statement .word::before,#statement .word::after{display:none}
+#statement .glyph{display:inline-block;position:relative;white-space:pre;animation:letter-decode .28s steps(3,end) both;transform-origin:50% 70%;filter:drop-shadow(0 0 4px rgba(255,255,255,.19))}
+#statement .glyph:nth-child(3n){animation-duration:.36s}
+#statement .glyph:nth-child(4n){animation-duration:.20s}
+@keyframes letter-decode{0%{opacity:0;transform:translateY(-20px) scaleY(1.9) skewX(30deg);filter:blur(6px)}36%{opacity:1;transform:translate(3px,4px) scaleY(.63) skewX(-24deg)}65%{opacity:.5;transform:translate(-2px,-1px) scaleY(1.15) skewX(12deg)}100%{opacity:1;transform:none;filter:blur(0)}}
+#statement .cursor{display:inline-block;width:.065em;height:.72em;vertical-align:-.05em;margin-left:.04em;background:#f0e6d9;animation:cursor-blink .62s steps(1) infinite}
+@keyframes cursor-blink{50%{opacity:0}}
+#contact .decode-target{visibility:hidden}
+#contact .decode-target.decode-on{visibility:visible}
+#contact .decode-target .glyph{display:inline-block;white-space:pre;animation:letter-decode .32s steps(3,end) both}
+#contact h1{font-family:Impact,"Arial Narrow",system-ui,sans-serif;font-weight:800;letter-spacing:-.065em;text-transform:uppercase;font-size:clamp(38px,10vw,80px)}
+#contact button.decode-target{overflow:hidden}
+#contact input{transition:opacity .6s,border-color .3s}
+@media(prefers-reduced-motion:reduce){#statement .glyph,#contact .glyph{animation:none}}
+
+/* Preserved independent form levitation from VOID 005. */
 #contact #contactCTA{filter:none!important;text-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;position:relative;isolation:isolate}
-#contact #contactCTA .glyph{filter:none!important;animation-name:cta-sharp-reveal;animation-timing-function:steps(3,end)}
-@keyframes cta-sharp-reveal{0%{opacity:0;transform:translateY(8px) skewX(-12deg)}55%{opacity:1;transform:translateY(-2px) skewX(5deg)}100%{opacity:1;transform:none}}
 #contact #contactvalue{will-change:transform;animation:void-float-input 8.8s ease-in-out infinite alternate}
 #contact #contactCTA{will-change:transform;animation:void-float-button 7.1s ease-in-out -2.6s infinite alternate}
 @keyframes void-float-input{0%{transform:translate3d(-3px,0,0)}45%{transform:translate3d(2px,-5px,0)}100%{transform:translate3d(-1px,3px,0)}}
 @keyframes void-float-button{0%{transform:translate3d(2px,3px,0)}55%{transform:translate3d(-3px,-5px,0)}100%{transform:translate3d(3px,1px,0)}}
 #contact #contactvalue:focus{animation:none;transform:none;will-change:auto}
 #contact #contactCTA:active{animation-play-state:paused}
-@media(prefers-reduced-motion:reduce){#contact #contactvalue,#contact #contactCTA{animation:none}#statement .glyph{animation:none}}
-
+@media(prefers-reduced-motion:reduce){#contact #contactvalue,#contact #contactCTA{animation:none}}
 /* VOID 006: single Monolith scene and touch-following countdown */
 #holdcount{width:82px;height:82px;border-radius:50%;display:none;align-items:center;justify-content:center;font:400 27px/1 ui-monospace,monospace;letter-spacing:-.055em;transform:translate(-50%,-50%);color:#fff;border:1px solid rgba(255,255,255,.12);background:radial-gradient(circle,rgba(0,0,0,.89) 0%,rgba(0,0,0,.67) 55%,transparent 72%);box-shadow:0 0 28px rgba(0,0,0,.65);filter:none;isolation:isolate}
 #holdcount.show{display:flex}
@@ -107,13 +109,7 @@ const words=['Sei','ancora','fermo','qui?','Tieni','premuto','per','5','secondi'
 // Each word is built character by character three seconds after ENTRA.
 function glyphFor(char,i){
  const span=document.createElement('span');span.className='glyph';span.textContent=char;
- span.style.animationDelay=(i*34)+'ms';
- const n=i+1;span.style.setProperty('--rise',(((n*19)%9)-4)+'px');
- span.style.setProperty('--rot',(((n*13)%19)-9)+'deg');
- span.style.setProperty('--skew',(((n*17)%19)-9)+'deg');
- span.style.setProperty('--stretchx',(n%4===0?.77:n%4===2?1.13:.97));
- span.style.setProperty('--stretchy',(n%5===0?1.27:n%5===2?.83:1));
- return span;
+ span.style.animationDelay=(i*34)+'ms';return span;
 }
 function setTyped(element,word,visible,reset){
  if(reset){element.replaceChildren();element.dataset.typed='0'}
