@@ -141,10 +141,32 @@
 #restart{border:0;background:transparent;color:inherit;font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:clamp(47px,13vw,115px);font-weight:900;line-height:1;letter-spacing:-.072em;text-align:center;cursor:pointer;padding:38px 16px;max-width:95vw}
 #restart:focus-visible{outline:1px solid #f2f0ec;outline-offset:12px}
 @media(prefers-reduced-motion:reduce){.enter::after{animation:none}#holdcount,#holdnumber{transform:translate(-50%,-50%)!important}}
+
+/* VOID 015 — dusty gradient fades when typing, heavy terminal lettering, calmer material depth */
+#contact{background:#000;isolation:isolate}
+#contact::before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:
+ radial-gradient(ellipse 95% 65% at 68% 30%,rgba(63,63,66,.55) 0%,rgba(31,31,34,.35) 38%,transparent 78%),
+ radial-gradient(ellipse 70% 80% at 17% 80%,rgba(46,46,48,.43) 0%,transparent 70%),
+ linear-gradient(144deg,#0a0a0b 0%,#171719 45%,#030303 100%);
+ opacity:1;transition:opacity 1.35s ease-in-out;
+}
+#contact.typing::before{opacity:0}
+#contact .mini,#contact h1,#contact form{position:relative;z-index:1}
+#statement .word{
+ font-family:"Arial Black",Impact,Arial,Helvetica,sans-serif!important;
+ font-weight:900!important;font-synthesis:weight;
+ letter-spacing:-.045em!important;
+ -webkit-text-stroke:.55px currentColor;
+}
+#statement .flap-char{font-family:inherit!important;font-weight:900!important;-webkit-text-stroke:.55px currentColor;letter-spacing:-.045em!important}
+#ui .phase{font-family:Arial,"Helvetica Neue",sans-serif;font-size:clamp(27px,7vw,39px);font-weight:600;letter-spacing:-.065em;text-transform:lowercase}
+#ui .phase-meta{font-size:8px;letter-spacing:.21em;text-transform:lowercase;white-space:normal;max-width:250px;line-height:1.5}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
 <section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 002</div></section>
-<div class="ui" id="ui"><div class="head"><span>VOID — 002</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · TILT</div><div class="foot"><div><div class="phase" id="phase">Monolith</div><div class="phase-meta" id="descriptor">SCULPTED MATTER</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
+<div class="ui" id="ui"><div class="head"><span>VOID — 002</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · TILT</div><div class="foot"><div><div class="phase" id="phase">vincenzopace</div><div class="phase-meta" id="descriptor">creative robeaccaso director</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
 <div id="prompt" role="status" aria-live="polite"></div><button id="motion">ENABLE MOTION</button><button id="camera" aria-pressed="false" title="Camera light modulates an abstract background; no images are saved">CAMERA / OFF</button><div id="lightmeter" aria-live="off"><div class="reading"><span>LIGHT</span><span id="lightvalue">--%</span></div><div class="track"><div class="fill" id="lightfill"></div></div></div>
 <div id="statement" aria-hidden="true"><span class="word" id="statementWord"></span></div>
 <div id="holdcount" aria-hidden="true"></div><div id="holdnumber" aria-live="off">5</div>
@@ -166,6 +188,7 @@ const names=['Aether','Lattice','Monolith'],labels=['ATMOSPHERE','PARTICLE FIELD
 let w=1,h=1,dpr=1,run=false,scene=2,form=2,time=0,last=0,energy=0,pulse=0,depth=0,drag={x:0,y:0},tilt={x:0,y:0},target={x:0,y:0},point={x:.5,y:.5},down=null,holding=false,holdTimer=0,motionActive=false,messageTimer=0,raf=0;
 let noiseCanvas=document.createElement('canvas'),grain=noiseCanvas.getContext('2d');
 const distortCanvas=document.createElement('canvas'),distortCtx=distortCanvas.getContext('2d',{alpha:false});
+const waterCanvas=document.createElement('canvas'),waterCtx=waterCanvas.getContext('2d',{alpha:true});
 let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // The experience rests after twenty seconds without touch, independent of camera and motion.
 const IDLE_FADE_MS=20000;let lastTouch=performance.now(),idleBlack=0;
@@ -248,17 +271,26 @@ $('contactform').addEventListener('submit',async ev=>{
  $('contact').classList.remove('show');
 });
 $('restart').addEventListener('click',()=>{window.location.reload()});
+$('contactvalue').addEventListener('input',()=>{$('contact').classList.toggle('typing',$('contactvalue').value.length>0)});
 function markInteraction(){lastTouch=performance.now()}
 
 const cameraVideo=document.createElement('video');cameraVideo.muted=true;cameraVideo.playsInline=true;cameraVideo.setAttribute('playsinline','');const cameraCanvas=document.createElement('canvas');cameraCanvas.width=48;cameraCanvas.height=72;const cameraCtx=cameraCanvas.getContext('2d',{willReadFrequently:true});let cameraStream=null,cameraActive=false,cameraBusy=false,cameraLight=.5,filteredLight=.5,lastCameraSample=0,cameraSamples=0,cameraError=false,lightLow=1,lightHigh=0;
 function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
 function lerp(a,b,s){return a+(b-a)*s}
-function resize(){w=window.innerWidth;h=window.innerHeight;dpr=Math.min(devicePixelRatio||1,Math.max(1,Math.sqrt(1700000/(w*h))));canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);distortCanvas.width=canvas.width;distortCanvas.height=canvas.height;noiseCanvas.width=192;noiseCanvas.height=336;const img=grain.createImageData(192,336);for(let i=0;i<img.data.length;i+=4){const v=Math.floor(Math.random()*255);img.data[i]=v;img.data[i+1]=v;img.data[i+2]=v;img.data[i+3]=Math.floor(Math.random()*92)}grain.putImageData(img,0,0)}
+function resize(){w=window.innerWidth;h=window.innerHeight;dpr=Math.min(devicePixelRatio||1,Math.max(1,Math.sqrt(1700000/(w*h))));canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);distortCanvas.width=canvas.width;distortCanvas.height=canvas.height;waterCanvas.width=canvas.width;waterCanvas.height=canvas.height;noiseCanvas.width=192;noiseCanvas.height=336;const img=grain.createImageData(192,336);for(let i=0;i<img.data.length;i+=4){const v=Math.floor(Math.random()*255);img.data[i]=v;img.data[i+1]=v;img.data[i+2]=v;img.data[i+3]=Math.floor(Math.random()*92)}grain.putImageData(img,0,0)}
 window.addEventListener('resize',resize,{passive:true});resize();
 function announce(s){$('prompt').textContent=s;$('prompt').classList.add('show');clearTimeout(messageTimer);messageTimer=setTimeout(()=>$('prompt').classList.remove('show'),850)}
 function choose(n){/* Single approved Monolith scene — swiping does not switch scenes. */}
-function orientation(e){if(e.gamma==null||e.beta==null)return;target.x=clamp(e.gamma/32,-1,1);target.y=clamp((e.beta-35)/46,-1,1);$('sensor').textContent='MOTION / ACTIVE'}
-async function motion(){markInteraction();try{if(!window.DeviceOrientationEvent){$('sensor').textContent='MOTION / UNAVAILABLE';return}if(typeof DeviceOrientationEvent.requestPermission==='function'){let r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){$('sensor').textContent='MOTION / OFF';return}}window.addEventListener('deviceorientation',orientation,{passive:true});motionActive=true;$('motion').classList.remove('show')}catch{$('sensor').textContent='MOTION / UNAVAILABLE'}}
+let motionOrigin=null;
+function orientation(e){
+ if(e.gamma==null||e.beta==null)return;
+ if(!motionOrigin)motionOrigin={gamma:e.gamma,beta:e.beta};
+ // Calibrate neutral tilt on activation; small physical movements become clearly visible.
+ target.x=clamp((e.gamma-motionOrigin.gamma)/12,-1,1);
+ target.y=clamp((e.beta-motionOrigin.beta)/16,-1,1);
+ $('sensor').textContent='MOTION / ACTIVE';
+}
+async function motion(){markInteraction();try{if(!window.DeviceOrientationEvent){$('sensor').textContent='MOTION / UNAVAILABLE';return}if(typeof DeviceOrientationEvent.requestPermission==='function'){let r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){$('sensor').textContent='MOTION / OFF';return}}motionOrigin=null;window.addEventListener('deviceorientation',orientation,{passive:true});motionActive=true;$('motion').classList.remove('show')}catch{$('sensor').textContent='MOTION / UNAVAILABLE'}}
 $('motion').addEventListener('click',motion);
 function stopCamera(){markInteraction();cameraActive=false;if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null}cameraVideo.pause();cameraVideo.srcObject=null;$('camera').classList.remove('active');$('camera').setAttribute('aria-pressed','false');$('camera').textContent='CAMERA / OFF';$('sensor').textContent='MATERIAL / LIVE';cameraLight=.5;cameraSamples=0;lightLow=1;lightHigh=0;$('lightmeter').classList.remove('show')}
 async function toggleCamera(){markInteraction();if(cameraBusy)return;if(cameraActive){stopCamera();announce('CAMERA / OFF');return}if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){announce('CAMERA UNAVAILABLE');return}cameraBusy=true;$('camera').disabled=true;let pending=null;try{pending=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'user'},width:{ideal:320},height:{ideal:240},frameRate:{ideal:10,max:15}}});cameraStream=pending;cameraVideo.srcObject=pending;await cameraVideo.play();cameraActive=true;lastCameraSample=0;cameraSamples=0;cameraError=false;lightLow=1;lightHigh=0;filteredLight=.5;$('lightmeter').classList.add('show');$('lightvalue').textContent='...';$('camera').classList.add('active');$('camera').textContent='CAMERA / ON';$('camera').setAttribute('aria-pressed','true');$('sensor').textContent='LIGHT / LIVE';announce('LIGHT SENSING')}catch(e){if(pending)pending.getTracks().forEach(t=>t.stop());cameraStream=null;cameraVideo.srcObject=null;announce(e&&e.name==='NotAllowedError'?'CAMERA DENIED':'CAMERA UNAVAILABLE')}finally{cameraBusy=false;$('camera').disabled=false}}
@@ -274,7 +306,7 @@ window.addEventListener('keydown',e=>{if(!run)return;markInteraction();/* keyboa
 document.addEventListener('visibilitychange',()=>{last=0});
 function background(cx,cy,atmosphere){ctx.fillStyle='#020202';ctx.fillRect(0,0,w,h);const radius=Math.max(w,h)*.79;let g=ctx.createRadialGradient(cx,cy,.01,cx,cy,radius);g.addColorStop(0,atmosphere>0.5?'#171512':'#121518');g.addColorStop(.32,'#090909');g.addColorStop(1,'#010101');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}
 function field(morph,dt){
-const tw=w*.5+tilt.x*w*.065+drag.x*w*.14,th=h*.49+tilt.y*h*.065+drag.y*h*.09;
+const tw=w*.5+tilt.x*w*.22+drag.x*w*.14,th=h*.49+tilt.y*h*.17+drag.y*h*.09;
 const spacing=Math.max(6.8,Math.min(10.5,w/44));const cols=Math.ceil(w/spacing)+10,rows=Math.ceil(h/spacing)+15;
 const x0=(w-(cols-1)*spacing)/2,y0=(h-(rows-1)*spacing)/2;
 const reach=Math.min(w,h)*.76,px=point.x*w,py=point.y*h;
@@ -282,7 +314,7 @@ for(let j=0;j<rows;j++){for(let i=0;i<cols;i++){
 let bx=x0+i*spacing,by=y0+j*spacing;
 const nx=(bx-tw)/reach,ny=(by-th)/reach;
 const radial=Math.sqrt(nx*nx+ny*ny),a=Math.atan2(ny,nx);
-const wave=Math.sin(radial*13.5-time*.83+scrollOffset+Math.sin(a*2.4)*.85)*.5+.5;
+const wave=Math.sin(radial*13.5-time*.83+scrollOffset+tilt.x*2.8+Math.sin(a*2.4+tilt.y*1.7)*.85)*.5+.5;
 const folded=Math.sin(nx*10+Math.cos(ny*6+time*.32+scrollOffset*.43)*2.6)+Math.cos(ny*9.3-nx*5.5-time*.19-scrollOffset);
 const mountain=Math.exp(-Math.pow((ny+.15*Math.sin(nx*5+time*.3+scrollOffset)+nx*nx*.38)*2.1,2));
 const hollow=Math.exp(-Math.pow((nx-.24*Math.sin(ny*4-time*.36+scrollOffset))*.95,2)-Math.pow((ny+.08)*1.8,2));
@@ -358,7 +390,7 @@ $('lightmeter').style.opacity=(1-idleBlack).toFixed(3);
 if($('motion').classList.contains('show'))$('motion').style.opacity=(1-idleBlack).toFixed(3);$('statement').style.opacity=(phraseStarted?Math.max(0,1-idleBlack):0).toFixed(3);
 // Endless seamless background scroll: only the material phase changes; UI and typography stay fixed.
  /* seamless background scrolling suspended for testing; phase stays fixed. */
- const cx=w*.5+tilt.x*w*.07,cy=h*.48+tilt.y*h*.06;
+ const cx=w*.5+tilt.x*w*.19,cy=h*.48+tilt.y*h*.14;
 background(cx,cy,form<.7);
 // Blurred monochrome camera backdrop below VOID's original digital material.
 // Camera frames stay local; grayscale and blur do not affect light sensing.
@@ -407,29 +439,43 @@ let vignette=ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*.2,w/2,h/2,Math.max(
 // Camera modulates exposure in addition to the abstract live background; pixels remain local.
 if(cameraActive&&cameraSamples>0){const normalized=clamp((filteredLight-.08)/.78,0,1);const delta=normalized-.5;if(delta>0){const strength=Math.pow(delta*2,1.25);const g=ctx.createRadialGradient(w*.5,h*.46,0,w*.5,h*.46,Math.max(w,h)*.78);g.addColorStop(0,'rgba(233,226,215,'+(strength*.12).toFixed(3)+')');g.addColorStop(.55,'rgba(171,166,158,'+(strength*.06).toFixed(3)+')');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}else{ctx.fillStyle='rgba(0,0,0,'+(Math.pow(-delta*2,1.2)*.30).toFixed(3)+')';ctx.fillRect(0,0,w,h)}}
 // Refract the already-rendered scene locally so the camera, particles and orange streak bend together.
-if(liquidForce>.015&&down&&distortCtx){
+if(liquidForce>.015&&down&&distortCtx&&waterCtx){
  const centerX=down.currentX,centerY=down.currentY;
  const radius=Math.min(w*.65,260),left=Math.max(0,centerX-radius),right=Math.min(w,centerX+radius);
  const top=Math.max(0,centerY-radius),bottom=Math.min(h,centerY+radius);
+ const width=right-left,height=bottom-top;
+ // Refraction is painted on a separate transparent layer and feathered radially.
+ // No hard-edged rectangular draw can leak into the main composition.
  distortCtx.setTransform(1,0,0,1,0,0);distortCtx.drawImage(canvas,0,0);
- ctx.save();ctx.globalAlpha=.96;
+ waterCtx.setTransform(1,0,0,1,0,0);
+ waterCtx.clearRect(left*dpr,top*dpr,width*dpr,height*dpr);
+ waterCtx.setTransform(dpr,0,0,dpr,0,0);
  const strip=5;
  for(let y=top;y<bottom;y+=strip){
-  const height=Math.min(strip,bottom-y);
-  const norm=(y+height*.5-centerY)/radius;
+  const sh=Math.min(strip,bottom-y),norm=(y+sh*.5-centerY)/radius;
   const reach=Math.sqrt(Math.max(0,1-norm*norm));
   const shift=(Math.sin(norm*15-time*6.5)*33+Math.sin(norm*27+time*3.5)*18)*liquidForce*reach;
-  const sx=Math.max(0,left+shift),sw=Math.min(w-sx,right-left);
-  if(sw>0)ctx.drawImage(distortCanvas,sx*dpr,y*dpr,sw*dpr,height*dpr,left,y,sw,height);
+  const sourceX=Math.max(0,left+shift),sourceW=Math.min(w-sourceX,width);
+  if(sourceW>0)waterCtx.drawImage(distortCanvas,sourceX*dpr,y*dpr,sourceW*dpr,sh*dpr,left,y,sourceW,sh);
  }
- ctx.restore();
- // Moving water lens: translucent concentric caustics centred on the finger.
+ // destination-in masks the refraction to a smooth circular water lens.
+ waterCtx.globalCompositeOperation='destination-in';
+ const fade=waterCtx.createRadialGradient(centerX,centerY,radius*.24,centerX,centerY,radius);
+ fade.addColorStop(0,'rgba(0,0,0,1)');
+ fade.addColorStop(.50,'rgba(0,0,0,.94)');
+ fade.addColorStop(.76,'rgba(0,0,0,.55)');
+ fade.addColorStop(1,'rgba(0,0,0,0)');
+ waterCtx.fillStyle=fade;waterCtx.fillRect(left,top,width,height);
+ waterCtx.globalCompositeOperation='source-over';
+ ctx.drawImage(waterCanvas,left*dpr,top*dpr,width*dpr,height*dpr,left,top,width,height);
+ // Smooth water-caustic rings fade naturally at the edge as well.
  ctx.save();ctx.globalCompositeOperation='screen';
  for(let n=0;n<3;n++){
- const rad=(28+n*48+time*26)%radius;
- ctx.beginPath();ctx.ellipse(centerX,centerY,rad,rad*.78,Math.sin(time*.6)*.2,0,Math.PI*2);
- ctx.strokeStyle='rgba(205,220,222,'+(liquidForce*(.105-n*.023)).toFixed(3)+')';
- ctx.lineWidth=1.1;ctx.stroke();
+  const rad=(28+n*48+time*26)%radius;
+  const edgeFade=Math.pow(Math.max(0,1-rad/radius),1.4);
+  ctx.beginPath();ctx.ellipse(centerX,centerY,rad,rad*.78,Math.sin(time*.6)*.2,0,Math.PI*2);
+  ctx.strokeStyle='rgba(205,220,222,'+(liquidForce*edgeFade*(.105-n*.023)).toFixed(3)+')';
+  ctx.lineWidth=1.1;ctx.stroke();
  }
  ctx.restore();
 }
