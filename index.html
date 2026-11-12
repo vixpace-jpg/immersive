@@ -77,10 +77,13 @@ function glyphFor(char,i){
  const span=document.createElement('span');span.className='glyph';span.textContent=char;
  span.style.animationDelay=(i*34)+'ms';return span;
 }
-function setTyped(element,word,visible){
- element.replaceChildren();
- for(let i=0;i<Math.min(visible,word.length);i++)element.appendChild(glyphFor(word[i],i));
- if(visible<word.length){const cursor=document.createElement('span');cursor.className='cursor';element.appendChild(cursor)}
+function setTyped(element,word,visible,reset){
+ if(reset){element.replaceChildren();element.dataset.typed='0'}
+ const prior=Number(element.dataset.typed||0);
+ const cursor=element.querySelector('.cursor');if(cursor)cursor.remove();
+ for(let i=prior;i<Math.min(visible,word.length);i++)element.appendChild(glyphFor(word[i],i));
+ element.dataset.typed=String(visible);
+ if(visible<word.length){const next=document.createElement('span');next.className='cursor';element.appendChild(next)}
 }
 function changeWord(now){
  if(firstTouchAt===null||now-firstTouchAt<10000)return;
@@ -89,9 +92,9 @@ function changeWord(now){
  const word=words[i],local=elapsed%2000;
  const visible=Math.min(word.length,Math.floor(local/95)+1);
  if(i!==prevWord||visible!==lastTyped){
-  prevWord=i;lastTyped=visible;
+  const isNewWord=i!==prevWord;prevWord=i;lastTyped=visible;
   const t=$('statementWord');
-  setTyped(t,word,visible);
+  setTyped(t,word,visible,isNewWord);
   t.style.transform='skewX('+(((i*13)%17)-8)+'deg) scaleX('+(i%3===0?.87:1.04)+')';
   t.style.opacity=(local>1690?Math.max(.05,(2000-local)/310):1);
  }
