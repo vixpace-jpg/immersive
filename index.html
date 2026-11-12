@@ -6,7 +6,7 @@
 <title>VOID — Material Experience / 002</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Oxanium:wght@700;800&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#030303;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none}body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#e6e5e2}button{font:inherit}#world{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}#intro{position:fixed;inset:0;background:#020202;display:grid;place-items:center;z-index:6;transition:opacity 1.25s ease,visibility 1.25s}#intro.off{opacity:0;visibility:hidden;pointer-events:none}.enter{position:relative;border:none;background:transparent;color:#ededeb;padding:30px 34px;font-size:13px;font-weight:400;letter-spacing:.56em;text-indent:.56em;cursor:pointer}.enter:after{content:"";position:absolute;left:50%;bottom:20px;width:28px;height:1px;background:#777;transform:translateX(-50%);transition:width .7s}.enter:active:after{width:110px}.intro-meta{position:absolute;left:0;right:0;bottom:calc(48px + env(safe-area-inset-bottom));font:9px ui-monospace,monospace;letter-spacing:.22em;text-align:center;color:#545454}.ui{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity 1.5s;z-index:3}.ui.show{opacity:1}.head{position:absolute;left:28px;right:28px;top:calc(29px + env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center;font:10px ui-monospace,monospace;letter-spacing:.18em;color:#a1a19f}.head span:last-child{color:#666}.foot{position:absolute;bottom:calc(30px + env(safe-area-inset-bottom));left:28px;right:28px;display:flex;justify-content:space-between;align-items:end;gap:22px}.phase{font-size:clamp(28px,8vw,43px);font-weight:200;letter-spacing:-.055em;line-height:.95}.phase-meta{font:9px ui-monospace,monospace;letter-spacing:.12em;color:#8d8b87;margin-top:13px}.index{font:10px ui-monospace,monospace;letter-spacing:.13em;color:#777;white-space:nowrap}.side{position:absolute;right:24px;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;font:9px ui-monospace,monospace;letter-spacing:.23em;color:#777}.progress{position:absolute;left:28px;right:28px;bottom:calc(14px + env(safe-area-inset-bottom));height:1px;background:#2c2c2c}.progress i{display:block;width:33.333%;height:1px;background:#dedbd6;transition:transform 750ms cubic-bezier(.2,.75,.2,1)}#motion{position:fixed;z-index:5;left:50%;bottom:calc(112px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111c;color:#ddd;border:1px solid #555;padding:11px 16px;letter-spacing:.12em;font-size:9px;white-space:nowrap;display:none}#motion.show{display:block}#camera{position:fixed;z-index:5;right:27px;top:calc(62px + env(safe-area-inset-top));border:1px solid #555;background:rgba(5,5,5,.72);color:#d6d4d0;padding:10px 12px;letter-spacing:.12em;font:9px ui-monospace,monospace;cursor:pointer}#camera.active{border-color:#aaa;color:#fff}#camera:disabled{opacity:.45}#lightmeter{position:fixed;z-index:5;right:27px;top:calc(109px + env(safe-area-inset-top));width:110px;pointer-events:none;display:none}#lightmeter.show{display:block}#lightmeter .reading{font:10px ui-monospace,monospace;color:#ccc;letter-spacing:.08em;display:flex;justify-content:space-between;margin-bottom:6px}#lightmeter .track{height:2px;background:#454545}#lightmeter .fill{height:100%;width:0;background:#e0dcd5;transition:width .2s linear}#prompt{position:fixed;z-index:4;left:50%;top:55%;transform:translate(-50%,-50%);pointer-events:none;font:9px ui-monospace,monospace;letter-spacing:.3em;white-space:nowrap;color:#e9e5e0;opacity:0;transition:opacity .35s;text-shadow:0 1px 14px black}#prompt.show{opacity:.85}@media(max-width:360px){.head{left:20px;right:20px}.foot{left:20px;right:20px}.side{right:15px}}@media(prefers-reduced-motion:reduce){#intro,.ui,#prompt,.progress i{transition:none}}
 
@@ -206,6 +206,41 @@
 #ending #endingLiquid{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;display:none}
 #ending.dissolving #endingLiquid{display:block}
 #ending.dissolving{background:#000}
+/* VOID 020 — typography laboratory: five carefully mixed geometric futuristic typefaces */
+#statement #statementWord{
+ font-family:"Syne",sans-serif!important;font-weight:800!important;
+ line-height:1.09!important;letter-spacing:-.055em!important;
+ text-shadow:none!important;filter:none!important;-webkit-text-stroke:0!important;
+}
+#statement #statementWord .flap-line{
+ line-height:1.09!important;font-weight:800!important;
+ letter-spacing:-.055em!important;white-space:nowrap;
+}
+#statement #statementWord .flap-char{
+ font-size:clamp(16px,4.7vw,24px)!important;
+ font-family:"Syne",sans-serif!important;
+ font-weight:800!important;font-synthesis:none!important;
+ min-width:.53em!important;letter-spacing:-.065em!important;
+ text-shadow:none!important;filter:none!important;
+ -webkit-text-stroke:0!important;
+}
+#statement #statementWord .flap-char.font-syne{font-family:"Syne",sans-serif!important;font-weight:800!important}
+#statement #statementWord .flap-char.font-space{font-family:"Space Grotesk",sans-serif!important;font-weight:700!important}
+#statement #statementWord .flap-char.font-unbounded{font-family:"Unbounded",sans-serif!important;font-weight:800!important;font-size:clamp(15px,4.3vw,22px)!important}
+#statement #statementWord .flap-char.font-oxanium{font-family:"Oxanium",sans-serif!important;font-weight:800!important}
+#statement #statementWord .flap-char.font-michroma{font-family:"Michroma",sans-serif!important;font-weight:400!important;font-size:clamp(14px,4vw,20px)!important}
+#statement #statementWord .flap-char.space{min-width:.28em!important}
+#statement #statementWord .flap-char.active,#statement #statementWord .flap-char.locked{background:none!important;box-shadow:none!important;text-shadow:none!important;filter:none!important}
+#statement .word::before,#statement .word::after{display:none!important}
+#contact #contactTitle,#contact #contactTitle .glyph,#ending #restart{
+ font-family:"Syne",sans-serif!important;font-weight:800!important;
+ text-shadow:none!important;filter:none!important;-webkit-text-stroke:0!important;
+}
+#contact #contactCTA,#ui .phase{font-family:"Space Grotesk",sans-serif!important}
+#ui .phase{font-weight:700!important}
+@media(max-width:390px){#statement #statementWord .flap-char{font-size:4.3vw!important}
+#statement #statementWord .flap-char.font-unbounded{font-size:4vw!important}
+#statement #statementWord .flap-char.font-michroma{font-size:3.8vw!important}}
 </style></head><body>
 <canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
 <section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 002</div></section>
@@ -241,12 +276,13 @@ const messageText=messageLines.join('');
 const flapGlyphs=[];
 let lastFlapTick=-1;
 const glyphSet='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?#%';
+const fontMix=['syne','space','unbounded','oxanium','michroma'];
 function setupFlap(){
  const parent=$('statementWord');parent.replaceChildren();flapGlyphs.length=0;
  messageLines.forEach((line,l)=>{
   const row=document.createElement('span');row.className='flap-line';
   for(const letter of line){
-   const span=document.createElement('span');span.className='flap-char'+(letter===' '?' space':'');
+   const span=document.createElement('span');const f=fontMix[(flapGlyphs.length*7+Math.floor(flapGlyphs.length/5))%fontMix.length];span.className='flap-char font-'+f+(letter===' '?' space':'');
    span.textContent=letter===' '?' ':glyphSet[(flapGlyphs.length*11+7)%glyphSet.length];span.dataset.target=letter;
    row.appendChild(span);flapGlyphs.push(span);
   }
@@ -328,7 +364,7 @@ function dissolveEnding(){
  const source=document.createElement('canvas'),sc=source.getContext('2d',{willReadFrequently:true});
  const size=Math.min(parseFloat(computed.fontSize)||70,width*.13);
  source.width=Math.ceil(width);source.height=Math.ceil(height);
- sc.fillStyle='#f2f0ec';sc.font='900 '+size+'px Montserrat,Arial,sans-serif';
+ sc.fillStyle='#f2f0ec';sc.font='800 '+size+'px Syne,Arial,sans-serif';
  sc.textAlign='center';sc.textBaseline='middle';
  sc.fillText('NOT TODAY',width/2,rect.top+rect.height/2,Math.max(20,width-32));
  const pixels=sc.getImageData(0,0,source.width,source.height).data;
