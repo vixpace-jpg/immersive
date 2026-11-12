@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#030303"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>VOID — Material Experience / 002</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Oxanium:wght@700;800&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#030303;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none}body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#e6e5e2}button{font:inherit}#world{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}#intro{position:fixed;inset:0;background:#020202;display:grid;place-items:center;z-index:6;transition:opacity 1.25s ease,visibility 1.25s}#intro.off{opacity:0;visibility:hidden;pointer-events:none}.enter{position:relative;border:none;background:transparent;color:#ededeb;padding:30px 34px;font-size:13px;font-weight:400;letter-spacing:.56em;text-indent:.56em;cursor:pointer}.enter:after{content:"";position:absolute;left:50%;bottom:20px;width:28px;height:1px;background:#777;transform:translateX(-50%);transition:width .7s}.enter:active:after{width:110px}.intro-meta{position:absolute;left:0;right:0;bottom:calc(48px + env(safe-area-inset-bottom));font:9px ui-monospace,monospace;letter-spacing:.22em;text-align:center;color:#545454}.ui{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity 1.5s;z-index:3}.ui.show{opacity:1}.head{position:absolute;left:28px;right:28px;top:calc(29px + env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center;font:10px ui-monospace,monospace;letter-spacing:.18em;color:#a1a19f}.head span:last-child{color:#666}.foot{position:absolute;bottom:calc(30px + env(safe-area-inset-bottom));left:28px;right:28px;display:flex;justify-content:space-between;align-items:end;gap:22px}.phase{font-size:clamp(28px,8vw,43px);font-weight:200;letter-spacing:-.055em;line-height:.95}.phase-meta{font:9px ui-monospace,monospace;letter-spacing:.12em;color:#8d8b87;margin-top:13px}.index{font:10px ui-monospace,monospace;letter-spacing:.13em;color:#777;white-space:nowrap}.side{position:absolute;right:24px;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;font:9px ui-monospace,monospace;letter-spacing:.23em;color:#777}.progress{position:absolute;left:28px;right:28px;bottom:calc(14px + env(safe-area-inset-bottom));height:1px;background:#2c2c2c}.progress i{display:block;width:33.333%;height:1px;background:#dedbd6;transition:transform 750ms cubic-bezier(.2,.75,.2,1)}#motion{position:fixed;z-index:5;left:50%;bottom:calc(112px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#111c;color:#ddd;border:1px solid #555;padding:11px 16px;letter-spacing:.12em;font-size:9px;white-space:nowrap;display:none}#motion.show{display:block}#camera{position:fixed;z-index:5;right:27px;top:calc(62px + env(safe-area-inset-top));border:1px solid #555;background:rgba(5,5,5,.72);color:#d6d4d0;padding:10px 12px;letter-spacing:.12em;font:9px ui-monospace,monospace;cursor:pointer}#camera.active{border-color:#aaa;color:#fff}#camera:disabled{opacity:.45}#lightmeter{position:fixed;z-index:5;right:27px;top:calc(109px + env(safe-area-inset-top));width:110px;pointer-events:none;display:none}#lightmeter.show{display:block}#lightmeter .reading{font:10px ui-monospace,monospace;color:#ccc;letter-spacing:.08em;display:flex;justify-content:space-between;margin-bottom:6px}#lightmeter .track{height:2px;background:#454545}#lightmeter .fill{height:100%;width:0;background:#e0dcd5;transition:width .2s linear}#prompt{position:fixed;z-index:4;left:50%;top:55%;transform:translate(-50%,-50%);pointer-events:none;font:9px ui-monospace,monospace;letter-spacing:.3em;white-space:nowrap;color:#e9e5e0;opacity:0;transition:opacity .35s;text-shadow:0 1px 14px black}#prompt.show{opacity:.85}@media(max-width:360px){.head{left:20px;right:20px}.foot{left:20px;right:20px}.side{right:15px}}@media(prefers-reduced-motion:reduce){#intro,.ui,#prompt,.progress i{transition:none}}
+
+/* VOID 003 / amorphous language and conversion */
+#statement{position:fixed;z-index:3;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0;transition:opacity 1s;overflow:hidden}
+#statement.show{opacity:1}
+#statement .word{display:block;position:relative;max-width:92vw;padding:0 12px;color:rgba(231,230,224,.78);font-family:Impact,"Arial Black",system-ui,sans-serif;font-size:clamp(52px,15.5vw,145px);font-stretch:condensed;font-weight:900;line-height:.82;letter-spacing:-.105em;text-transform:uppercase;text-align:center;overflow-wrap:anywhere;filter:blur(.35px);mix-blend-mode:screen;will-change:transform,filter;transform:rotate(var(--rot,0deg)) skewX(var(--skew,0deg)) scaleX(var(--sx,1)) scaleY(var(--sy,1));transition:transform .34s cubic-bezier(.2,1.4,.3,1),filter .22s}
+#statement .word::before{content:attr(data-word);position:absolute;inset:0;color:rgba(248,241,231,.12);transform:translate(5px,-3px) skewY(8deg);mix-blend-mode:screen;pointer-events:none}
+#statement .word::after{content:attr(data-word);position:absolute;inset:0;color:rgba(0,0,0,.85);clip-path:polygon(0 46%,100% 40%,100% 51%,0 58%);transform:translateX(var(--tear,0px)) skewX(-13deg);pointer-events:none}
+#holdcount{position:fixed;z-index:8;display:none;pointer-events:none;font:400 42px/1 ui-monospace,monospace;letter-spacing:-.07em;color:#f1e8dc;text-shadow:0 0 24px rgba(255,111,26,.42);transform:translate(-50%,-100%)}
+#holdcount.show{display:block}
+#contact{position:fixed;inset:0;z-index:10;display:none;background:#000;color:#e9e9e5;padding:env(safe-area-inset-top) 28px env(safe-area-inset-bottom);align-items:center;justify-content:center;flex-direction:column;text-align:center;opacity:0;transition:opacity 1.15s}
+#contact.show{display:flex;opacity:1}
+#contact .mini{font:10px ui-monospace,monospace;letter-spacing:.3em;color:#808080;margin-bottom:32px}
+#contact h1{font-size:clamp(34px,9vw,68px);font-weight:250;line-height:1;letter-spacing:-.07em;max-width:620px;margin:0 0 34px}
+#contact form{width:min(100%,500px);display:flex;flex-direction:column;gap:20px}
+#contact input{width:100%;background:none;border:0;border-bottom:1px solid #888;color:white;border-radius:0;outline:none;font:300 clamp(18px,5vw,24px) system-ui,sans-serif;padding:16px 3px}
+#contact input:focus{border-color:#ff771e}
+#contact button{min-height:54px;background:#efeee9;color:#070707;border:0;cursor:pointer;font:600 12px system-ui,sans-serif;letter-spacing:.11em;padding:16px}
+#contact .note{font:11px/1.6 system-ui,sans-serif;color:#777;margin-top:15px;max-width:340px}
+#contact #contactstatus{min-height:20px;color:#e1ad82;font:11px system-ui,sans-serif}
+@media(max-width:420px){#statement .word{font-size:15vw}}
+
+/* 004 kinetic digital typography */
+#statement .word{font-family:"Arial Narrow",Impact,system-ui,sans-serif;font-size:clamp(48px,15vw,126px);font-weight:900;letter-spacing:-.075em;line-height:1.05;text-shadow:1px 0 rgba(255,255,255,.27),-3px 0 rgba(150,150,150,.17);min-height:1.1em;transform:none;filter:none;transition:none}
+#statement .word::before,#statement .word::after{display:none}
+#statement .glyph{display:inline-block;position:relative;white-space:pre;animation:letter-decode .28s steps(3,end) both;transform-origin:50% 70%;filter:drop-shadow(0 0 4px rgba(255,255,255,.19))}
+#statement .glyph:nth-child(3n){animation-duration:.36s}
+#statement .glyph:nth-child(4n){animation-duration:.20s}
+@keyframes letter-decode{0%{opacity:0;transform:translateY(-20px) scaleY(1.9) skewX(30deg);filter:blur(6px)}36%{opacity:1;transform:translate(3px,4px) scaleY(.63) skewX(-24deg)}65%{opacity:.5;transform:translate(-2px,-1px) scaleY(1.15) skewX(12deg)}100%{opacity:1;transform:none;filter:blur(0)}}
+#statement .cursor{display:inline-block;width:.065em;height:.72em;vertical-align:-.05em;margin-left:.04em;background:#f0e6d9;animation:cursor-blink .62s steps(1) infinite}
+@keyframes cursor-blink{50%{opacity:0}}
+#contact .decode-target{visibility:hidden}
+#contact .decode-target.decode-on{visibility:visible}
+#contact .decode-target .glyph{display:inline-block;white-space:pre;animation:letter-decode .32s steps(3,end) both}
+#contact h1{font-family:Impact,"Arial Narrow",system-ui,sans-serif;font-weight:800;letter-spacing:-.065em;text-transform:uppercase;font-size:clamp(38px,10vw,80px)}
+#contact button.decode-target{overflow:hidden}
+#contact input{transition:opacity .6s,border-color .3s}
+@media(prefers-reduced-motion:reduce){#statement .glyph,#contact .glyph{animation:none}}
+
+/* 004 kinetic digital typography */
+#statement .word{font-family:"Arial Narrow",Impact,system-ui,sans-serif;font-size:clamp(48px,15vw,126px);font-weight:900;letter-spacing:-.075em;line-height:1.05;text-shadow:1px 0 rgba(255,255,255,.27),-3px 0 rgba(150,150,150,.17);min-height:1.1em;transform:none;filter:none;transition:none}
+#statement .word::before,#statement .word::after{display:none}
+#statement .glyph{display:inline-block;position:relative;white-space:pre;animation:letter-decode .28s steps(3,end) both;transform-origin:50% 70%;filter:drop-shadow(0 0 4px rgba(255,255,255,.19))}
+#statement .glyph:nth-child(3n){animation-duration:.36s}
+#statement .glyph:nth-child(4n){animation-duration:.20s}
+@keyframes letter-decode{0%{opacity:0;transform:translateY(-20px) scaleY(1.9) skewX(30deg);filter:blur(6px)}36%{opacity:1;transform:translate(3px,4px) scaleY(.63) skewX(-24deg)}65%{opacity:.5;transform:translate(-2px,-1px) scaleY(1.15) skewX(12deg)}100%{opacity:1;transform:none;filter:blur(0)}}
+#statement .cursor{display:inline-block;width:.065em;height:.72em;vertical-align:-.05em;margin-left:.04em;background:#f0e6d9;animation:cursor-blink .62s steps(1) infinite}
+@keyframes cursor-blink{50%{opacity:0}}
+#contact .decode-target{visibility:hidden}
+#contact .decode-target.decode-on{visibility:visible}
+#contact .decode-target .glyph{display:inline-block;white-space:pre;animation:letter-decode .32s steps(3,end) both}
+#contact h1{font-family:Impact,"Arial Narrow",system-ui,sans-serif;font-weight:800;letter-spacing:-.065em;text-transform:uppercase;font-size:clamp(38px,10vw,80px)}
+#contact button.decode-target{overflow:hidden}
+#contact input{transition:opacity .6s,border-color .3s}
+@media(prefers-reduced-motion:reduce){#statement .glyph,#contact .glyph{animation:none}}
+
+/* Preserved independent form levitation from VOID 005. */
+#contact #contactCTA{filter:none!important;text-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;position:relative;isolation:isolate}
+#contact #contactvalue{will-change:transform;animation:void-float-input 8.8s ease-in-out infinite alternate}
+#contact #contactCTA{will-change:transform;animation:void-float-button 7.1s ease-in-out -2.6s infinite alternate}
+@keyframes void-float-input{0%{transform:translate3d(-3px,0,0)}45%{transform:translate3d(2px,-5px,0)}100%{transform:translate3d(-1px,3px,0)}}
+@keyframes void-float-button{0%{transform:translate3d(2px,3px,0)}55%{transform:translate3d(-3px,-5px,0)}100%{transform:translate3d(3px,1px,0)}}
+#contact #contactvalue:focus{animation:none;transform:none;will-change:auto}
+#contact #contactCTA:active{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){#contact #contactvalue,#contact #contactCTA{animation:none}}
+/* VOID 007: explicit heavy clean black sans, no decorative glitch font */
+#statement .word,#contact #contactTitle{
+ font-family:Arial,"Helvetica Neue",Helvetica,system-ui,sans-serif!important;
+ font-weight:900!important;font-stretch:normal!important;letter-spacing:-.07em;
+ text-shadow:none!important;filter:none!important;font-style:normal!important;
+}
+#statement .word{font-size:clamp(54px,15vw,124px);transform:none!important}
+#statement .glyph,#contact #contactTitle .glyph{font-family:inherit!important;font-weight:900!important;filter:none!important;animation-name:void-clean-letter!important;animation-duration:.24s!important;animation-timing-function:ease-out!important}
+@keyframes void-clean-letter{from{opacity:0;transform:translateY(9px);filter:none}to{opacity:1;transform:none;filter:none}}
+#contact #contactCTA,#contact #contactCTA .glyph{font-family:Arial,"Helvetica Neue",Helvetica,system-ui,sans-serif!important;font-weight:800!important;filter:none!important;text-shadow:none!important;animation-name:void-clean-letter!important}
+/* VOID 006: single Monolith scene and touch-following countdown */
+#holdcount{width:82px;height:82px;border-radius:50%;display:none;align-items:center;justify-content:center;font:400 27px/1 ui-monospace,monospace;letter-spacing:-.055em;transform:translate(-50%,-50%);color:#fff;border:1px solid rgba(255,255,255,.12);background:radial-gradient(circle,rgba(0,0,0,.89) 0%,rgba(0,0,0,.67) 55%,transparent 72%);box-shadow:0 0 28px rgba(0,0,0,.65);filter:none;isolation:isolate}
+#holdcount.show{display:flex}
+#holdcount::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -90deg,#ff781f var(--progress,0%),rgba(255,255,255,.17) var(--progress,0%));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));pointer-events:none}
+#holdcount::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(255,117,25,.19);pointer-events:none}
+#statement{transform-origin:center;will-change:transform}
+
+/* VOID 008 - restrained railway split-flap lettering */
+#statement .word{font-family:Arial,"Helvetica Neue",system-ui,sans-serif!important;font-size:clamp(19px,5.8vw,29px)!important;font-weight:900!important;line-height:1.42!important;letter-spacing:.008em!important;max-width:min(92vw,530px);text-shadow:none!important;transform:none!important;filter:none!important;text-align:center}
+#statement .flap-line{display:block;white-space:nowrap}
+#statement .flap-char{display:inline-block;min-width:.59em;font-variant-numeric:tabular-nums;white-space:pre;vertical-align:middle;position:relative;transform:perspective(130px) rotateX(var(--flip,0deg));transition:transform .12s linear;opacity:var(--alpha,1)}
+#statement .flap-char.space{min-width:.36em}
+#statement .flap-char.active{color:#f1eee9;text-shadow:0 0 8px rgba(255,255,255,.17);background:linear-gradient(to bottom,transparent 48%,rgba(0,0,0,.43) 49%,transparent 53%)}
+#statement .flap-char.locked{color:#d4d3d0;background:none;transform:none;opacity:1}
+#contact .mini,#contact .note{line-height:1.65}
+@media(prefers-reduced-motion:reduce){#statement .flap-char{transition:none}}
+
+/* VOID 010 — CTA must be visible even when decode animation is delayed */
+#contact.show #contactCTA,#contact #contactCTA.decode-target{
+ visibility:visible!important;opacity:1!important;display:block!important;
+ color:#070707!important;background:#efeee9!important;
+}
+/* VOID 009 — countdown number outside ring, sharp independently floating CTA */
+#holdcount{font-size:0!important}
+#holdnumber{position:fixed;z-index:9;display:none;pointer-events:none;transform:translate(-50%,-50%);font:700 29px/1 Arial,Helvetica,sans-serif;color:#f4f1ed;text-shadow:0 0 12px rgba(255,123,22,.45);font-variant-numeric:tabular-nums}
+#holdnumber.show{display:block}
+#contact #contactCTA{animation:void-float-button 7.1s ease-in-out -2.6s infinite alternate!important;filter:none!important;text-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#contact #contactCTA:active{animation-play-state:paused!important}
+#contact #contactTitle{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif!important;font-size:clamp(34px,9vw,66px);line-height:1.05;font-weight:900!important;letter-spacing:-.065em}
+#contact #contactTitle .glyph{display:inline-block;white-space:pre;animation:letter-decode .3s ease-out both}
+@media(prefers-reduced-motion:reduce){#contact #contactCTA{animation:none!important}}
+
+/* VOID 011 — centered contact field */
+#contact #contactvalue{text-align:center!important}
+#contact #contactvalue::placeholder{text-align:center;color:rgba(232,231,226,.7)}
+
+/* VOID 012 — reliable, visible 5-second split-flap reveal */
+#statement{z-index:7!important;opacity:0;visibility:hidden;transition:opacity .32s ease,visibility 0s linear .32s}
+#statement.show{visibility:visible;transition:opacity .32s ease,visibility 0s;opacity:1}
+#statement .word{color:#f2f0ea!important;mix-blend-mode:normal!important;filter:none!important;text-shadow:0 2px 12px rgba(0,0,0,.7)!important;opacity:1!important}
+#statement .word::before,#statement .word::after{display:none!important}
+#statement .flap-char{opacity:1!important;color:#f2f0ea!important;visibility:visible!important}
+#statement .flap-char.active{color:#fff!important}
+
+/* VOID 013 — understated irregular ENTER pulse, tight split-flap type, growing tactile counter */
+.enter::after{animation:void-enter-flicker 7.8s linear infinite;will-change:opacity}
+@keyframes void-enter-flicker{
+ 0%,9%{opacity:.66}11%{opacity:.15}13%,25%{opacity:.82}
+ 29%,31%{opacity:.07}34%,45%{opacity:.55}49%{opacity:.12}
+ 54%,65%{opacity:.9}69%{opacity:.22}72%,83%{opacity:.58}
+ 88%,90%{opacity:.08}93%,100%{opacity:.72}
+}
+#statement .word{font-weight:900!important;letter-spacing:-.025em!important}
+#statement .flap-char{font-weight:900!important;letter-spacing:-.025em!important}
+#holdcount{transform:translate(calc(-50% + var(--shake-x,0px)),calc(-50% + var(--shake-y,0px)))!important;will-change:transform}
+#holdnumber{transform:translate(calc(-50% + var(--shake-x,0px)),calc(-50% + var(--shake-y,0px)))!important;will-change:transform}
+#ending{position:fixed;inset:0;z-index:25;display:none;place-items:center;background:#000;color:#f2f0ec;opacity:0;transition:opacity .65s ease}
+#ending.show{display:grid;opacity:1}
+#restart{border:0;background:transparent;color:inherit;font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:clamp(47px,13vw,115px);font-weight:900;line-height:1;letter-spacing:-.072em;text-align:center;cursor:pointer;padding:38px 16px;max-width:95vw}
+#restart:focus-visible{outline:1px solid #f2f0ec;outline-offset:12px}
+@media(prefers-reduced-motion:reduce){.enter::after{animation:none}#holdcount,#holdnumber{transform:translate(-50%,-50%)!important}}
+
+/* VOID 015 — dusty gradient fades when typing, heavy terminal lettering, calmer material depth */
+#contact{background:#000;isolation:isolate}
+#contact::before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:
+ radial-gradient(ellipse 95% 65% at 68% 30%,rgba(63,63,66,.55) 0%,rgba(31,31,34,.35) 38%,transparent 78%),
+ radial-gradient(ellipse 70% 80% at 17% 80%,rgba(46,46,48,.43) 0%,transparent 70%),
+ linear-gradient(144deg,#0a0a0b 0%,#171719 45%,#030303 100%);
+ opacity:1;transition:opacity 1.35s ease-in-out;
+}
+#contact.typing::before{opacity:0}
+#contact .mini,#contact h1,#contact form{position:relative;z-index:1}
+#statement .word{
+ font-family:"Arial Black",Impact,Arial,Helvetica,sans-serif!important;
+ font-weight:900!important;font-synthesis:weight;
+ letter-spacing:-.045em!important;
+ -webkit-text-stroke:.55px currentColor;
+}
+#statement .flap-char{font-family:inherit!important;font-weight:900!important;-webkit-text-stroke:.55px currentColor;letter-spacing:-.045em!important}
+#ui .phase{font-family:Arial,"Helvetica Neue",sans-serif;font-size:clamp(27px,7vw,39px);font-weight:600;letter-spacing:-.065em;text-transform:lowercase}
+#ui .phase-meta{font-size:8px;letter-spacing:.21em;text-transform:lowercase;white-space:normal;max-width:250px;line-height:1.5}
+/* VOID 016 — Montserrat Black (900): unified display type */
+#statement .word,#statement .flap-char,#contact #contactTitle,#contact #contactTitle .glyph,#restart{
+ font-family:"Montserrat","Arial Black",Arial,sans-serif!important;
+ font-weight:900!important;
+ font-synthesis:none;
+}
+#statement .word{font-size:clamp(18px,5.35vw,27px)!important;letter-spacing:-.05em!important;-webkit-text-stroke:0!important}
+#statement .flap-char{font-weight:900!important;letter-spacing:-.05em!important;-webkit-text-stroke:0!important;min-width:.58em}
+#contact #contactCTA{font-family:"Montserrat",Arial,sans-serif!important;font-weight:800!important}
+#ui .phase{font-family:"Montserrat",Arial,sans-serif!important;font-weight:700}
+/* VOID 017 — enforce Montserrat Black on every animated glyph and tighten lines */
+#statement #statementWord{
+ font-family:"Montserrat","Arial Black",Arial,sans-serif!important;
+ font-weight:900!important;
+ font-synthesis:none!important;
+ line-height:1.13!important;
+ letter-spacing:-.055em!important;
+}
+#statement #statementWord .flap-line{
+ display:block;
+ font-family:"Montserrat","Arial Black",Arial,sans-serif!important;
+ font-weight:900!important;
+ line-height:1.13!important;
+ letter-spacing:-.055em!important;
+}
+#statement #statementWord .flap-char{
+ font-family:"Montserrat","Arial Black",Arial,sans-serif!important;
+ font-weight:900!important;
+ font-synthesis:none!important;
+ letter-spacing:-.055em!important;
+ min-width:.54em;
+}
+#statement #statementWord .flap-char.space{min-width:.32em}
+/* VOID 019 — three-second NOT TODAY rupture / liquid dissolution */
+#ending{overflow:hidden}
+#ending #restart{position:relative;z-index:1;transition:opacity .12s ease}
+#ending.dissolving #restart{opacity:0;pointer-events:none}
+#ending #endingLiquid{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;display:none}
+#ending.dissolving #endingLiquid{display:block}
+#ending.dissolving{background:#000}
+/* VOID 020 — typography laboratory: five carefully mixed geometric futuristic typefaces */
+#statement #statementWord{
+ font-family:"Syne",sans-serif!important;font-weight:800!important;
+ line-height:1.09!important;letter-spacing:-.055em!important;
+ text-shadow:none!important;filter:none!important;-webkit-text-stroke:0!important;
+}
+#statement #statementWord .flap-line{
+ line-height:1.09!important;font-weight:800!important;
+ letter-spacing:-.055em!important;white-space:nowrap;
+}
+#statement #statementWord .flap-char{
+ font-size:clamp(16px,4.7vw,24px)!important;
+ font-family:"Syne",sans-serif!important;
+ font-weight:800!important;font-synthesis:none!important;
+ min-width:.53em!important;letter-spacing:-.065em!important;
+ text-shadow:none!important;filter:none!important;
+ -webkit-text-stroke:0!important;
+}
+#statement #statementWord .flap-char.font-syne{font-family:"Syne",sans-serif!important;font-weight:800!important}
+#statement #statementWord .flap-char.font-space{font-family:"Space Grotesk",sans-serif!important;font-weight:700!important}
+#statement #statementWord .flap-char.font-unbounded{font-family:"Unbounded",sans-serif!important;font-weight:800!important;font-size:clamp(15px,4.3vw,22px)!important}
+#statement #statementWord .flap-char.font-oxanium{font-family:"Oxanium",sans-serif!important;font-weight:800!important}
+#statement #statementWord .flap-char.font-michroma{font-family:"Michroma",sans-serif!important;font-weight:400!important;font-size:clamp(14px,4vw,20px)!important}
+#statement #statementWord .flap-char.space{min-width:.28em!important}
+#statement #statementWord .flap-char.active,#statement #statementWord .flap-char.locked{background:none!important;box-shadow:none!important;text-shadow:none!important;filter:none!important}
+#statement .word::before,#statement .word::after{display:none!important}
+#contact #contactTitle,#contact #contactTitle .glyph,#ending #restart{
+ font-family:"Syne",sans-serif!important;font-weight:800!important;
+ text-shadow:none!important;filter:none!important;-webkit-text-stroke:0!important;
+}
+#contact #contactCTA,#ui .phase{font-family:"Space Grotesk",sans-serif!important}
+#ui .phase{font-weight:700!important}
+@media(max-width:390px){#statement #statementWord .flap-char{font-size:4.3vw!important}
+#statement #statementWord .flap-char.font-unbounded{font-size:4vw!important}
+#statement #statementWord .flap-char.font-michroma{font-size:3.8vw!important}}
+/* VOID 022 — larger experimental typography, smaller contact heading, mono signature */
+#statement #statementWord .flap-char{font-size:clamp(19px,5.5vw,29px)!important}
+#statement #statementWord .flap-char.font-unbounded{font-size:clamp(18px,5.05vw,27px)!important}
+#statement #statementWord .flap-char.font-michroma{font-size:clamp(17px,4.8vw,25px)!important}
+@media(max-width:390px){
+ #statement #statementWord .flap-char{font-size:5.3vw!important}
+ #statement #statementWord .flap-char.font-unbounded{font-size:4.9vw!important}
+ #statement #statementWord .flap-char.font-michroma{font-size:4.6vw!important}
+}
+#contact #contactTitle{
+ font-size:clamp(30px,8vw,62px)!important;
+ line-height:1.03!important;
+}
+#ui #phase{
+ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace!important;
+ font-weight:400!important;
+ font-size:clamp(22px,5.8vw,32px)!important;
+ letter-spacing:-.055em!important;
+}
+/* VOID 023 — visibly larger split-flap, distinctly smaller contact headline, mono footer */
+#statement #statementWord{max-width:calc(100vw - 20px)!important;line-height:1.07!important}
+#statement #statementWord .flap-line{line-height:1.07!important;max-width:none!important;white-space:nowrap!important}
+#statement #statementWord .flap-char{font-size:clamp(21px,6.35vw,34px)!important}
+#statement #statementWord .flap-char.font-unbounded{font-size:clamp(20px,5.85vw,31px)!important}
+#statement #statementWord .flap-char.font-michroma{font-size:clamp(19px,5.55vw,29px)!important}
+@media(max-width:390px){
+ #statement #statementWord .flap-char{font-size:6.25vw!important}
+ #statement #statementWord .flap-char.font-unbounded{font-size:5.75vw!important}
+ #statement #statementWord .flap-char.font-michroma{font-size:5.45vw!important}
+}
+#contact #contactTitle{font-size:clamp(25px,6.4vw,49px)!important;line-height:1.08!important}
+#ui #phase{
+ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace!important;
+ font-size:clamp(22px,5.9vw,32px)!important;
+ font-weight:400!important;
+ letter-spacing:-.04em!important;
+ text-shadow:none!important;
+}
+/* VOID 024 — refined two-line contact headline */
+#contact #contactTitle,
+#contact #contactTitle .glyph{
+ font-family:"Space Grotesk","Helvetica Neue",Arial,sans-serif!important;
+ font-weight:600!important;
+ font-synthesis:none!important;
+ letter-spacing:-.055em!important;
+ text-shadow:none!important;
+ -webkit-text-stroke:0!important;
+}
+#contact #contactTitle{
+ font-size:clamp(38px,10.5vw,76px)!important;
+ line-height:1.04!important;
+ margin-bottom:34px;
+}
+/* VOID 025 — responsive split-flap and clear elegant contact typography */
+#statement #statementWord{
+ width:100%!important;max-width:100vw!important;
+ padding:0!important;overflow:visible!important;
+}
+#statement #statementWord .flap-line{
+ display:block!important;
+ position:relative!important;
+ left:50%!important;
+ width:max-content!important;
+ max-width:none!important;
+ white-space:nowrap!important;
+ text-align:left!important;
+ transform:translateX(-50%) scale(var(--fit-scale,1))!important;
+ transform-origin:center center!important;
+ line-height:1.10!important;
+}
+#statement #statementWord .flap-char{
+ min-width:0!important;
+ margin-right:.015em!important;
+}
+#statement #statementWord .flap-char.space{min-width:.24em!important}
+#contact #contactTitle,#contact #contactTitle .glyph{
+ font-family:"Space Grotesk","Helvetica Neue",Arial,sans-serif!important;
+ font-weight:500!important;
+ letter-spacing:-.065em!important;
+ text-shadow:none!important;
+ filter:none!important;
+ -webkit-text-stroke:0!important;
+}
+#contact #contactTitle{font-size:clamp(34px,8vw,56px)!important;line-height:1.08!important}
+</style></head><body>
+<canvas id="world" aria-label="Superficie digitale reattiva"></canvas>
+<section id="intro"><button class="enter" id="enter">ENTER</button><div class="intro-meta">VOID &nbsp; / &nbsp; AN INTERACTIVE STUDY &nbsp; 027</div></section>
+<div class="ui" id="ui"><div class="head"><span>VOID — 027</span><span id="sensor">MATERIAL / LIVE</span></div><div class="side">TOUCH · HOLD · TILT</div><div class="foot"><div><div class="phase" id="phase">vincenzopace</div><div class="phase-meta" id="descriptor">creative robeaccaso director</div></div><div class="index" id="index">MONOLITH / 01</div></div><div class="progress"><i id="bar"></i></div></div>
+<div id="prompt" role="status" aria-live="polite"></div><button id="motion">ENABLE MOTION</button><button id="camera" aria-pressed="false" title="Camera light modulates an abstract background; no images are saved">CAMERA / OFF</button><div id="lightmeter" aria-live="off"><div class="reading"><span>LIGHT</span><span id="lightvalue">--%</span></div><div class="track"><div class="fill" id="lightfill"></div></div></div>
+<div id="statement" aria-hidden="true"><span class="word" id="statementWord"></span></div>
+<div id="holdcount" aria-hidden="true"></div><div id="holdnumber" aria-live="off">5</div>
+<section id="contact" aria-label="Request a callback">
+  <div class="mini">VOID / BEYOND THE SURFACE</div>
+  <h1 id="contactTitle" class="decode-target" data-text="A NEW VISION\nSTARTS HERE.">A NEW VISION<br>STARTS HERE.</h1>
+  <form id="contactform">
+    <input id="contactvalue" name="contact" required autocomplete="email" placeholder="Email or phone number" aria-label="Email or phone number" maxlength="180">
+    <button type="submit" id="contactCTA" class="decode-target" data-text="EMBRACE CHANGE">EMBRACE CHANGE</button>
+    <div id="contactstatus" role="status"></div>
+  </form>
+</section>
+<section id="ending" aria-label="Final screen"><button id="restart" type="button" aria-label="Return to ENTER">NOT TODAY</button><canvas id="endingLiquid" aria-hidden="true"></canvas></section>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});if(!ctx)return;
+const names=['Aether','Lattice','Monolith'],labels=['ATMOSPHERE','PARTICLE FIELD','SCULPTED MATTER'];
+let w=1,h=1,dpr=1,run=false,scene=2,form=2,time=0,last=0,energy=0,pulse=0,depth=0,drag={x:0,y:0},tilt={x:0,y:0},target={x:0,y:0},point={x:.5,y:.5},down=null,holding=false,holdTimer=0,motionActive=false,messageTimer=0,raf=0;
+let noiseCanvas=document.createElement('canvas'),grain=noiseCanvas.getContext('2d');
+const distortCanvas=document.createElement('canvas'),distortCtx=distortCanvas.getContext('2d',{alpha:false});
+const waterCanvas=document.createElement('canvas'),waterCtx=waterCanvas.getContext('2d',{alpha:true});
+let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+// The experience rests after twenty seconds without touch, independent of camera and motion.
+const IDLE_FADE_MS=20000;let lastTouch=performance.now(),idleBlack=0;
+let completed=false, liquidForce=0, trailSeed=0, trailStarted=-1, enteredAt=null, phraseStarted=false, phraseFinished=false, scrollOffset=0, scrollVelocity=0, lastPointerY=null, lastHapticAt=0;
+const messageLines=['STILL STANDING HERE?','HOLD FOR 5 SECONDS','AND CHANGE YOUR VISION.'];
+const messageText=messageLines.join('');
+const flapGlyphs=[];
+let lastFlapTick=-1;
+const glyphSet='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?#%';
+const fontMix=['syne','space','unbounded','oxanium','michroma'];
+// Warm up all five web fonts before the first 10-second split-flap reveal.
+// Rendering remains functional with local fallback if the font CDN is blocked.
+if(document.fonts&&document.fonts.load){
+ Promise.allSettled([
+  document.fonts.load('800 24px "Syne"'),
+  document.fonts.load('700 24px "Space Grotesk"'),
+  document.fonts.load('800 24px "Unbounded"'),
+  document.fonts.load('800 24px "Oxanium"'),
+  document.fonts.load('400 24px "Michroma"')
+ ]).then(()=>{document.documentElement.dataset.fontsReady='true'});
+}
+function fitFlap(){
+ const rows=[...$('statementWord').querySelectorAll('.flap-line')];
+ if(!rows.length)return;
+ const available=Math.max(220,window.innerWidth-40);
+ const widest=Math.max(...rows.map(row=>row.scrollWidth));
+ const fit=Math.min(1,available/Math.max(1,widest));
+ $('statementWord').style.setProperty('--fit-scale',fit.toFixed(4));
+}
+function setupFlap(){
+ const parent=$('statementWord');parent.replaceChildren();flapGlyphs.length=0;
+ messageLines.forEach((line,l)=>{
+  const row=document.createElement('span');row.className='flap-line';
+  for(const letter of line){
+   const span=document.createElement('span');const f=fontMix[(flapGlyphs.length*7+Math.floor(flapGlyphs.length/5))%fontMix.length];span.className='flap-char font-'+f+(letter===' '?' space':'');
+   span.textContent=letter===' '?' ':glyphSet[(flapGlyphs.length*11+7)%glyphSet.length];span.dataset.target=letter;
+   row.appendChild(span);flapGlyphs.push(span);
+  }
+  parent.appendChild(row);
+ });
+ fitFlap();
+ // Refit once the external fonts are ready; font substitution must not clip any line.
+ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitFlap).catch(()=>{});
+}
+function runFlap(now){
+ if(enteredAt===null||now-enteredAt<10000)return;
+ if(!phraseStarted){phraseStarted=true;setupFlap();markInteraction();$('statement').classList.add('show');$('statement').style.visibility='visible'}
+ const elapsed=now-enteredAt-10000;
+ const total=6000;
+ if(elapsed>=total){
+  if(!phraseFinished){phraseFinished=true;flapGlyphs.forEach(span=>{span.textContent=span.dataset.target;span.classList.remove('active');span.classList.add('locked');span.style.setProperty('--flip','0deg')})}
+  return;
+ }
+ const tick=Math.floor(elapsed/95);if(tick===lastFlapTick)return;lastFlapTick=tick;
+ const count=flapGlyphs.length;
+ const progress=elapsed/total;
+ // Each individual cell settles in sequence. Earlier cells stay locked.
+ flapGlyphs.forEach((span,i)=>{
+  const settleAt=.12+.84*(i/Math.max(1,count-1));
+  if(span.dataset.target===' '){span.textContent=' ';span.classList.add('locked');return}
+  if(progress>=settleAt){span.textContent=span.dataset.target;span.classList.remove('active');span.classList.add('locked');span.style.setProperty('--flip','0deg')}
+  else if(progress>=Math.max(0,settleAt-.21)){
+   const n=(i*17+tick*13)%glyphSet.length;
+   span.textContent=glyphSet[n];span.classList.add('active');span.style.setProperty('--flip',(tick%2===0?-16:19)+'deg');
+  }else{span.textContent=glyphSet[(i*11+tick*7)%glyphSet.length];span.classList.add('active');span.style.setProperty('--flip',(tick%2?8:-8)+'deg')}
+ });
+}
+function animateFinalText(){
+ // Preserve the English message and reveal the title without affecting button geometry.
+ const title=$('contactTitle'),button=$('contactCTA'),input=$('contactvalue');
+ title.replaceChildren();title.classList.add('decode-on');
+ const lines=['A NEW VISION','STARTS HERE.'];
+ let index=0;
+ lines.forEach((line,i)=>{
+  if(i)title.appendChild(document.createElement('br'));
+  for(const char of line){
+   const glyph=document.createElement('span');glyph.className='glyph';glyph.textContent=char===' '?'\u00a0':char;
+   glyph.style.animationDelay=(240+index*49)+'ms';
+   glyph.style.animationFillMode='both';title.appendChild(glyph);index++;
+  }
+ });
+ button.textContent='EMBRACE CHANGE';
+ button.classList.add('decode-on');
+ button.style.visibility='visible';
+ button.style.opacity='1';
+ input.style.opacity='0';
+ setTimeout(()=>{input.style.opacity='1'},1500);
+}
+function completeJourney(){
+ if(completed)return;completed=true;down=null;holding=false;clearTimeout(holdTimer);
+ $('holdcount').classList.remove('show');$('holdnumber').classList.remove('show');stopCamera();
+ $('camera').style.display='none';$('motion').style.display='none';$('lightmeter').style.display='none';
+ $('statement').classList.remove('show');$('ui').classList.remove('show');
+ const el=$('contact');el.classList.add('show');animateFinalText();
+}
+$('contactform').addEventListener('submit',async ev=>{
+ ev.preventDefault();
+ const value=$('contactvalue').value.trim(),valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)||/^\+?[\d\s().-]{6,22}$/.test(value);
+ if(!valid){$('contactstatus').textContent='Enter a valid email or phone number.';return}
+ // Prototype: do not claim submission, store the contact, or send network requests.
+ $('contactvalue').value='';
+ $('ending').classList.add('show');
+ $('contact').classList.remove('show');
+});
+// 3s cinematic breakup: the letterforms burst, stretch into liquid drips,
+ // then dissolve to black before the experience returns to ENTER.
+let endingTransitioning=false;
+function dissolveEnding(){
+ if(endingTransitioning)return;
+ endingTransitioning=true;
+ const button=$('restart'),surface=$('ending'),canvas=$('endingLiquid');
+ const rect=button.getBoundingClientRect(),computed=getComputedStyle(button);
+ const width=window.innerWidth,height=window.innerHeight;
+ const ratio=Math.min(window.devicePixelRatio||1,2),c=canvas.getContext('2d',{alpha:true});
+ canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);
+ c.setTransform(ratio,0,0,ratio,0,0);
+ const source=document.createElement('canvas'),sc=source.getContext('2d',{willReadFrequently:true});
+ const size=Math.min(parseFloat(computed.fontSize)||70,width*.13);
+ source.width=Math.ceil(width);source.height=Math.ceil(height);
+ sc.fillStyle='#f2f0ec';sc.font='800 '+size+'px Syne,Arial,sans-serif';
+ sc.textAlign='center';sc.textBaseline='middle';
+ sc.fillText('NOT TODAY',width/2,rect.top+rect.height/2,Math.max(20,width-32));
+ const pixels=sc.getImageData(0,0,source.width,source.height).data;
+ const step=width<560?4:5,particles=[];
+ for(let y=0;y<height;y+=step)for(let x=0;x<width;x+=step){
+  if(pixels[(y*source.width+x)*4+3]<90)continue;
+  const dx=x-width/2,dy=y-height/2,r=Math.hypot(dx,dy)||1;
+  const jitter=Math.random(),speed=45+Math.random()*155;
+  particles.push({x,y,vx:dx/r*speed+(Math.random()-.5)*110,vy:dy/r*speed*.55-40-Math.random()*100,
+    phase:Math.random()*6.28,delay:Math.random()*.27,size:step*(.72+Math.random()*.48),drip:Math.random()*180});
+ }
+ surface.classList.add('dissolving');
+ const started=performance.now();
+ function render(t){
+  const elapsed=Math.min(3,(t-started)/1000);
+  c.clearRect(0,0,width,height);
+  // First a sudden outward rupture; then viscous gravity overtakes the fragments.
+  const fade=elapsed<1.8?1:Math.max(0,(3-elapsed)/1.2);
+  c.fillStyle='#f2f0ec';
+  for(let i=0;i<particles.length;i++){
+   const p=particles[i],age=Math.max(0,elapsed-p.delay);
+   const blow=Math.min(age,1.1),melt=Math.max(0,age-.22);
+   const ripple=Math.sin(age*11+p.phase)*Math.min(19,age*22);
+   const x=p.x+p.vx*blow+Math.sin(age*3.3+p.phase)*melt*23+ripple*.4;
+   const y=p.y+p.vy*blow+85*melt*melt+p.drip*melt*melt*.48;
+   const opacity=fade*Math.max(0,1-age*.12);
+   if(opacity<.008||y>height+45)continue;
+   c.globalAlpha=opacity;
+   const w=p.size*(1+Math.min(1.4,age)*.12);
+   const h=p.size*(1+Math.max(0,melt)*3.5);
+   c.fillRect(x,y,w,h);
+  }
+  c.globalAlpha=1;
+  if(elapsed<3)requestAnimationFrame(render);
+  else window.location.reload();
+ }
+ requestAnimationFrame(render);
+}
+$('restart').addEventListener('click',dissolveEnding);
+$('contactvalue').addEventListener('input',()=>{if($('contactvalue').value.length>0)$('contact').classList.add('typing')});
+function markInteraction(){lastTouch=performance.now()}
+
+const cameraVideo=document.createElement('video');cameraVideo.muted=true;cameraVideo.playsInline=true;cameraVideo.setAttribute('playsinline','');const cameraCanvas=document.createElement('canvas');cameraCanvas.width=48;cameraCanvas.height=72;const cameraCtx=cameraCanvas.getContext('2d',{willReadFrequently:true});let cameraStream=null,cameraActive=false,cameraBusy=false,cameraLight=.5,filteredLight=.5,lastCameraSample=0,cameraSamples=0,cameraError=false,lightLow=1,lightHigh=0;
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function lerp(a,b,s){return a+(b-a)*s}
+function resize(){w=window.innerWidth;h=window.innerHeight;dpr=Math.min(devicePixelRatio||1,Math.max(1,Math.sqrt(1700000/(w*h))));canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);distortCanvas.width=canvas.width;distortCanvas.height=canvas.height;waterCanvas.width=canvas.width;waterCanvas.height=canvas.height;noiseCanvas.width=192;noiseCanvas.height=336;const img=grain.createImageData(192,336);for(let i=0;i<img.data.length;i+=4){const v=Math.floor(Math.random()*255);img.data[i]=v;img.data[i+1]=v;img.data[i+2]=v;img.data[i+3]=Math.floor(Math.random()*92)}grain.putImageData(img,0,0)}
+window.addEventListener('resize',()=>{resize();if(phraseStarted)fitFlap()},{passive:true});resize();
+function announce(s){$('prompt').textContent=s;$('prompt').classList.add('show');clearTimeout(messageTimer);messageTimer=setTimeout(()=>$('prompt').classList.remove('show'),850)}
+function choose(n){/* Single approved Monolith scene — swiping does not switch scenes. */}
+let motionOrigin=null;
+function orientation(e){
+ if(e.gamma==null||e.beta==null)return;
+ if(!motionOrigin)motionOrigin={gamma:e.gamma,beta:e.beta};
+ // Calibrate neutral tilt on activation; small physical movements become clearly visible.
+ target.x=clamp((e.gamma-motionOrigin.gamma)/12,-1,1);
+ target.y=clamp((e.beta-motionOrigin.beta)/16,-1,1);
+ $('sensor').textContent='MOTION / ACTIVE';
+}
+async function motion(){markInteraction();try{if(!window.DeviceOrientationEvent){$('sensor').textContent='MOTION / UNAVAILABLE';return}if(typeof DeviceOrientationEvent.requestPermission==='function'){let r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){$('sensor').textContent='MOTION / OFF';return}}motionOrigin=null;window.addEventListener('deviceorientation',orientation,{passive:true});motionActive=true;$('motion').classList.remove('show')}catch{$('sensor').textContent='MOTION / UNAVAILABLE'}}
+$('motion').addEventListener('click',motion);
+function stopCamera(){markInteraction();cameraActive=false;if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null}cameraVideo.pause();cameraVideo.srcObject=null;$('camera').classList.remove('active');$('camera').setAttribute('aria-pressed','false');$('camera').textContent='CAMERA / OFF';$('sensor').textContent='MATERIAL / LIVE';cameraLight=.5;cameraSamples=0;lightLow=1;lightHigh=0;$('lightmeter').classList.remove('show')}
+async function toggleCamera(){markInteraction();if(cameraBusy)return;if(cameraActive){stopCamera();announce('CAMERA / OFF');return}if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){announce('CAMERA UNAVAILABLE');return}cameraBusy=true;$('camera').disabled=true;let pending=null;try{pending=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'user'},width:{ideal:320},height:{ideal:240},frameRate:{ideal:10,max:15}}});cameraStream=pending;cameraVideo.srcObject=pending;await cameraVideo.play();cameraActive=true;lastCameraSample=0;cameraSamples=0;cameraError=false;lightLow=1;lightHigh=0;filteredLight=.5;$('lightmeter').classList.add('show');$('lightvalue').textContent='...';$('camera').classList.add('active');$('camera').textContent='CAMERA / ON';$('camera').setAttribute('aria-pressed','true');$('sensor').textContent='LIGHT / LIVE';announce('LIGHT SENSING')}catch(e){if(pending)pending.getTracks().forEach(t=>t.stop());cameraStream=null;cameraVideo.srcObject=null;announce(e&&e.name==='NotAllowedError'?'CAMERA DENIED':'CAMERA UNAVAILABLE')}finally{cameraBusy=false;$('camera').disabled=false}}
+$('camera').addEventListener('click',toggleCamera);
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&cameraActive)stopCamera()});
+function sampleCamera(now){if(!cameraActive||!cameraCtx||now-lastCameraSample<130)return;lastCameraSample=now;if(cameraVideo.readyState<2)return;try{const vw=cameraVideo.videoWidth||320,vh=cameraVideo.videoHeight||240,ratio=Math.max(48/vw,72/vh),cw=48/ratio,ch=72/ratio;cameraCtx.drawImage(cameraVideo,(vw-cw)/2,(vh-ch)/2,cw,ch,0,0,48,72);const frameData=cameraCtx.getImageData(0,0,48,72),pixels=frameData.data;let sum=0;for(let i=0;i<pixels.length;i+=4){const r=pixels[i]/255,g=pixels[i+1]/255,b=pixels[i+2]/255;sum+=.2126*r*r+.7152*g*g+.0722*b*b;const gray=Math.round(.2126*pixels[i]+.7152*pixels[i+1]+.0722*pixels[i+2]);pixels[i]=gray;pixels[i+1]=gray;pixels[i+2]=gray}cameraCtx.putImageData(frameData,0,0);cameraLight=clamp(Math.sqrt(sum/(pixels.length/4)),0,1);cameraSamples++;lightLow=Math.min(cameraLight,lightLow);lightHigh=Math.max(cameraLight,lightHigh);$('lightvalue').textContent=Math.round(cameraLight*100)+'%';$('lightfill').style.width=Math.round(cameraLight*100)+'%';$('sensor').textContent='LIGHT / '+Math.round(cameraLight*100)+'%';cameraError=false}catch(e){if(!cameraError){cameraError=true;$('lightvalue').textContent='ERR';announce('LIGHT SENSOR ERROR')}}}
+$('enter').addEventListener('click',()=>{run=true;markInteraction();enteredAt=performance.now();scene=2;form=2;idleBlack=0;$('intro').classList.add('off');$('ui').classList.add('show');if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')$('motion').classList.add('show');else motion();if(!raf)raf=requestAnimationFrame(frame)});
+canvas.addEventListener('pointerdown',e=>{if(!run||completed)return;markInteraction();point={x:e.clientX/w,y:e.clientY/h};lastPointerY=e.clientY;down={x:e.clientX,y:e.clientY,currentX:e.clientX,currentY:e.clientY,t:performance.now(),holdStart:null,pointerId:e.pointerId};holding=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{holding=true;announce('HOLD / GRAVITY')},440);try{canvas.setPointerCapture(e.pointerId)}catch{}});
+canvas.addEventListener('pointermove',e=>{if(!run||completed)return;point={x:e.clientX/w,y:e.clientY/h};if(down&&e.pointerId===down.pointerId){markInteraction();const deltaY=e.clientY-down.currentY;/* scroll interaction temporarily suspended for testing */down.currentX=e.clientX;down.currentY=e.clientY;holding=true;}});
+function end(e){if(!down||completed)return;markInteraction();$('holdcount').classList.remove('show');$('holdnumber').classList.remove('show');clearTimeout(holdTimer);let dx=e.clientX-down.x,dy=e.clientY-down.y,d=Math.hypot(dx,dy);down=null;if(holding){holding=false;pulse=1.7;energy=1.25;announce('RELEASE');return}if(d>45){pulse=1.1;announce('MONOLITH')}else{point={x:e.clientX/w,y:e.clientY/h};pulse=1.5;energy=.9;announce('IMPULSE')}}
+canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',()=>{down=null;holding=false;$('holdcount').classList.remove('show');$('holdnumber').classList.remove('show');clearTimeout(holdTimer)});
+window.addEventListener('keydown',e=>{if(!run)return;markInteraction();/* keyboard scroll suspended for testing */if(e.key===' ')pulse=1.5});
+document.addEventListener('visibilitychange',()=>{last=0});
+function background(cx,cy,atmosphere){ctx.fillStyle='#020202';ctx.fillRect(0,0,w,h);const radius=Math.max(w,h)*.79;let g=ctx.createRadialGradient(cx,cy,.01,cx,cy,radius);g.addColorStop(0,atmosphere>0.5?'#171512':'#121518');g.addColorStop(.32,'#090909');g.addColorStop(1,'#010101');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}
+function field(morph,dt){
+const tw=w*.5+tilt.x*w*.22+drag.x*w*.14,th=h*.49+tilt.y*h*.17+drag.y*h*.09;
+const spacing=Math.max(6.8,Math.min(10.5,w/44));const cols=Math.ceil(w/spacing)+10,rows=Math.ceil(h/spacing)+15;
+const x0=(w-(cols-1)*spacing)/2,y0=(h-(rows-1)*spacing)/2;
+const reach=Math.min(w,h)*.76,px=point.x*w,py=point.y*h;
+for(let j=0;j<rows;j++){for(let i=0;i<cols;i++){
+let bx=x0+i*spacing,by=y0+j*spacing;
+const nx=(bx-tw)/reach,ny=(by-th)/reach;
+const radial=Math.sqrt(nx*nx+ny*ny),a=Math.atan2(ny,nx);
+const wave=Math.sin(radial*13.5-time*.83+scrollOffset+tilt.x*2.8+Math.sin(a*2.4+tilt.y*1.7)*.85)*.5+.5;
+const folded=Math.sin(nx*10+Math.cos(ny*6+time*.32+scrollOffset*.43)*2.6)+Math.cos(ny*9.3-nx*5.5-time*.19-scrollOffset);
+const mountain=Math.exp(-Math.pow((ny+.15*Math.sin(nx*5+time*.3+scrollOffset)+nx*nx*.38)*2.1,2));
+const hollow=Math.exp(-Math.pow((nx-.24*Math.sin(ny*4-time*.36+scrollOffset))*.95,2)-Math.pow((ny+.08)*1.8,2));
+const silver=clamp((.19+.34*folded+.65*mountain+.38*wave*.45)*(.72+.28*Math.cos(nx*2)),0,1);
+const glow=clamp(.65*mountain+.72*hollow+.1*wave,0,1);
+const dist=Math.hypot(bx-px,by-py),touch=Math.exp(-dist*dist/(w*w*.075));
+const deformation=(folded*.26+mountain*1.7+hollow*.5)*morph;
+const push=(holding?35:12*pulse)*touch;
+const dx=bx-(down?down.currentX:point.x*w),dy=by-(down?down.currentY:point.y*h);
+const rr=Math.hypot(dx,dy),angle=Math.atan2(dy,dx);
+const fluid=liquidForce*Math.exp(-rr*rr/(w*w*.30));
+const swirl=Math.sin(rr*.043-time*4.2)*fluid*63;
+let x=bx+nx*(deformation*18-push*.65)+Math.sin(ny*11+time*.28)*morph*4+Math.cos(angle+1.57)*swirl+fluid*Math.sin(dy*.028+time*2.1)*19;
+let y=by+ny*(deformation*29-push)+Math.cos(nx*9+time*.21)*morph*3+Math.sin(angle+1.57)*swirl+fluid*Math.cos(dx*.031-time*2.4)*23;
+const brightness=clamp((.1+.92*glow)*(1-morph)+silver*morph+touch*pulse*.27,0,1);
+const alpha=clamp(.008+Math.pow(brightness,2.1)*(.52+energy*.08),.008,.62);
+const size=(.68+2.35*brightness)*(1-morph*.22)+touch*pulse*.9;
+ctx.fillStyle='rgba('+(morph>.55?'217,219,223':'229,222,211')+','+alpha.toFixed(3)+')';
+ctx.beginPath();ctx.arc(x,y,size*.5,0,Math.PI*2);ctx.fill();
+}}
+}
+function atmosphere(){
+const cx=w*.47+tilt.x*38,cy=h*.41+tilt.y*47,spread=w*.98;
+ctx.save();ctx.globalCompositeOperation='screen';
+for(let k=0;k<5;k++){const xx=cx+Math.sin(time*.13+k*1.51)*w*.35,yy=cy+Math.cos(time*.11+k*.83)*h*.22;let r=spread*(.65+k*.10);let g=ctx.createRadialGradient(xx,yy,0,xx,yy,r);let op=(.10+.05*Math.sin(time*.25+k));g.addColorStop(0,'rgba(217,205,188,'+op+')');g.addColorStop(.38,'rgba(115,113,111,'+(op*.27)+')');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}ctx.restore()}
+function frame(now){raf=requestAnimationFrame(frame);let dt=Math.min(.045,(now-last||16)/1000);last=now;if(!run||completed)return;time+=dt*(reduced?.25:1);sampleCamera(now);filteredLight=lerp(filteredLight,cameraActive?cameraLight:.5,Math.min(1,dt*2.3));form=lerp(form,scene,Math.min(1,dt*2));tilt.x=lerp(tilt.x,target.x,Math.min(1,dt*3));tilt.y=lerp(tilt.y,target.y,Math.min(1,dt*3));drag.x*=Math.exp(-dt*1.7);drag.y*=Math.exp(-dt*1.7);pulse*=Math.exp(-dt*2.9);energy=lerp(energy,holding?2.0:0,Math.min(1,dt*2.8));depth*=Math.exp(-dt*.42);
+// The hold remains liquid immediately; the countdown only activates after the six-second phrase finishes.
+ runFlap(now);
+ if(down){
+  const liquidHeld=now-down.t;
+  liquidForce=lerp(liquidForce,clamp(liquidHeld/1300,0,1),Math.min(1,dt*8));
+  if(phraseFinished){
+   if(down.holdStart===null)down.holdStart=now;
+   const held=now-down.holdStart;
+   const counter=$('holdcount'),number=$('holdnumber');
+   counter.classList.add('show');number.classList.add('show');
+   const ringX=clamp(down.currentX,48,w-48),ringY=clamp(down.currentY,48,h-48);
+   counter.style.left=ringX+'px';counter.style.top=ringY+'px';
+   counter.style.setProperty('--progress',Math.min(100,held/5000*100).toFixed(1)+'%');
+   number.style.left=ringX+'px';
+   number.style.top=(ringY>=123?ringY-76:ringY+76)+'px';
+   number.textContent=String(Math.max(0,5-Math.floor(held/1000)));
+   // Irregular, progressively stronger visual tremor; on supported devices add brief haptic pulses.
+   const intensity=Math.min(1,held/6000),amplitude=Math.pow(intensity,1.6)*4.8;
+   const shakeX=amplitude*(Math.sin(now*.065)+Math.sin(now*.113)*.46);
+   const shakeY=amplitude*(Math.cos(now*.079)+Math.cos(now*.137)*.41);
+   counter.style.setProperty('--shake-x',shakeX.toFixed(2)+'px');
+   counter.style.setProperty('--shake-y',shakeY.toFixed(2)+'px');
+   number.style.setProperty('--shake-x',shakeX.toFixed(2)+'px');
+   number.style.setProperty('--shake-y',shakeY.toFixed(2)+'px');
+   if(typeof navigator.vibrate==='function'&&held>350){
+    const gap=550-intensity*240+Math.sin(held*.013)*65;
+    if(now-lastHapticAt>gap){
+     lastHapticAt=now;
+     try{navigator.vibrate(Math.round(4+intensity*13))}catch{}
+    }
+   }
+   if(held>=6000){completeJourney();return}
+  }
+ }else{liquidForce=lerp(liquidForce,0,Math.min(1,dt*3))}
+ $('statement').style.transform=liquidForce>.001?'translate('+Math.sin(time*4)*liquidForce*7+'px,'+Math.cos(time*3)*liquidForce*5+'px) skewX('+Math.sin(time*4)*liquidForce*4+'deg)':'none';
+// Keep the five-second wait and six-second message reveal visible before idling.
+const awaitingMessage=enteredAt!==null&&!phraseFinished;
+if(awaitingMessage)lastTouch=performance.now();
+const idleElapsed=Math.max(0,performance.now()-lastTouch);
+const idleProgress=clamp(idleElapsed/IDLE_FADE_MS,0,1);
+const eased=idleProgress*idleProgress*(3-2*idleProgress);
+// Fade out over 20 seconds. Wake back up smoothly at the first touch.
+idleBlack=lerp(idleBlack,eased,Math.min(1,dt*(eased<idleBlack?5:30)));
+$('ui').style.opacity=(1-idleBlack).toFixed(3);
+$('camera').style.opacity=(1-idleBlack).toFixed(3);
+$('lightmeter').style.opacity=(1-idleBlack).toFixed(3);
+if($('motion').classList.contains('show'))$('motion').style.opacity=(1-idleBlack).toFixed(3);$('statement').style.opacity=(phraseStarted?Math.max(0,1-idleBlack):0).toFixed(3);
+// Endless seamless background scroll: only the material phase changes; UI and typography stay fixed.
+ /* seamless background scrolling suspended for testing; phase stays fixed. */
+ const cx=w*.5+tilt.x*w*.19,cy=h*.48+tilt.y*h*.14;
+background(cx,cy,form<.7);
+// Blurred monochrome camera backdrop below VOID's original digital material.
+// Camera frames stay local; grayscale and blur do not affect light sensing.
+if(cameraActive&&cameraSamples>0){
+  ctx.save();
+  ctx.globalAlpha=.64;
+  ctx.filter='blur(13px)';
+  ctx.drawImage(cameraCanvas,-16,-16,w+32,h+32);
+  ctx.restore();
+  ctx.fillStyle='rgba(0,0,0,.77)';
+  ctx.fillRect(0,0,w,h);
+}
+if(form<1.15){ctx.save();ctx.globalAlpha=clamp(1-form*.6,0,1);atmosphere();ctx.restore()}
+const opacity=clamp(.24+form*.56,0,1);
+ctx.save();ctx.globalAlpha=opacity;field(clamp(form/2,0,1),dt);ctx.restore();
+if(form>.5){ctx.save();ctx.globalAlpha=clamp((form-.5)*.20,0,.25);let g=ctx.createRadialGradient(cx,cy,30,cx,cy,w*.95);g.addColorStop(0,'#e0d9ce');g.addColorStop(1,'#000');ctx.globalCompositeOperation='screen';ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.restore()}
+// Animated orange light ribbon: its head advances and a soft fading tail follows.
+if(Math.floor(time/5)>trailSeed){trailSeed=Math.floor(time/5);trailStarted=time}
+if(trailStarted>=0){
+ const age=time-trailStarted;
+ const u=Math.min(1,age/1.9);
+ if(age<3.3){
+  const bezier=t=>{
+   const q=1-t;
+   return {
+    x:q*q*q*(-w*.25)+3*q*q*t*(w*.6)+3*q*t*t*(-w*.2)+t*t*t*(w*1.25),
+    y:q*q*q*(-h*.10)+3*q*q*t*(h*.16)+3*q*t*t*(h*.85)+t*t*t*(h*1.13)
+   };
+  };
+  const begin=Math.max(0,u-.48),steps=28;
+  ctx.save();ctx.globalCompositeOperation='screen';ctx.lineCap='round';
+  for(let k=1;k<=steps;k++){
+   const a=begin+(u-begin)*(k-1)/steps,b=begin+(u-begin)*k/steps;
+   if(b<=a)continue;
+   const pa=bezier(a),pb=bezier(b);
+   const tail=(k/steps)**1.9,fade=Math.min(1,(3.3-age)*1.3);
+   ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);
+   ctx.strokeStyle='rgba(255,105,12,'+(tail*.72*fade).toFixed(3)+')';
+   ctx.lineWidth=.5+tail*2.1;ctx.shadowColor='#ff6d0a';ctx.shadowBlur=11+tail*14;ctx.stroke();
+  }
+  ctx.restore();
+ }
+}
+ctx.save();ctx.globalAlpha=.06+(scene===0?.07:.018);ctx.imageSmoothingEnabled=true;ctx.drawImage(noiseCanvas,0,0,w,h);ctx.restore();
+let vignette=ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*.2,w/2,h/2,Math.max(w,h)*.82);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,0,0,.83)');ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
+// Camera modulates exposure in addition to the abstract live background; pixels remain local.
+if(cameraActive&&cameraSamples>0){const normalized=clamp((filteredLight-.08)/.78,0,1);const delta=normalized-.5;if(delta>0){const strength=Math.pow(delta*2,1.25);const g=ctx.createRadialGradient(w*.5,h*.46,0,w*.5,h*.46,Math.max(w,h)*.78);g.addColorStop(0,'rgba(233,226,215,'+(strength*.12).toFixed(3)+')');g.addColorStop(.55,'rgba(171,166,158,'+(strength*.06).toFixed(3)+')');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}else{ctx.fillStyle='rgba(0,0,0,'+(Math.pow(-delta*2,1.2)*.30).toFixed(3)+')';ctx.fillRect(0,0,w,h)}}
+// Refract the already-rendered scene locally so the camera, particles and orange streak bend together.
+if(liquidForce>.015&&down&&distortCtx&&waterCtx){
+ const centerX=down.currentX,centerY=down.currentY;
+ const radius=Math.min(w*.65,260),left=Math.max(0,centerX-radius),right=Math.min(w,centerX+radius);
+ const top=Math.max(0,centerY-radius),bottom=Math.min(h,centerY+radius);
+ const width=right-left,height=bottom-top;
+ // Refraction is painted on a separate transparent layer and feathered radially.
+ // No hard-edged rectangular draw can leak into the main composition.
+ distortCtx.setTransform(1,0,0,1,0,0);distortCtx.drawImage(canvas,0,0);
+ waterCtx.setTransform(1,0,0,1,0,0);
+ waterCtx.clearRect(left*dpr,top*dpr,width*dpr,height*dpr);
+ waterCtx.setTransform(dpr,0,0,dpr,0,0);
+ const strip=5;
+ for(let y=top;y<bottom;y+=strip){
+  const sh=Math.min(strip,bottom-y),norm=(y+sh*.5-centerY)/radius;
+  const reach=Math.sqrt(Math.max(0,1-norm*norm));
+  const shift=(Math.sin(norm*15-time*6.5)*33+Math.sin(norm*27+time*3.5)*18)*liquidForce*reach;
+  const sourceX=Math.max(0,left+shift),sourceW=Math.min(w-sourceX,width);
+  if(sourceW>0)waterCtx.drawImage(distortCanvas,sourceX*dpr,y*dpr,sourceW*dpr,sh*dpr,left,y,sourceW,sh);
+ }
+ // destination-in masks the refraction to a smooth circular water lens.
+ waterCtx.globalCompositeOperation='destination-in';
+ const fade=waterCtx.createRadialGradient(centerX,centerY,radius*.24,centerX,centerY,radius);
+ fade.addColorStop(0,'rgba(0,0,0,1)');
+ fade.addColorStop(.50,'rgba(0,0,0,.94)');
+ fade.addColorStop(.76,'rgba(0,0,0,.55)');
+ fade.addColorStop(1,'rgba(0,0,0,0)');
+ waterCtx.fillStyle=fade;waterCtx.fillRect(left,top,width,height);
+ waterCtx.globalCompositeOperation='source-over';
+ ctx.drawImage(waterCanvas,left*dpr,top*dpr,width*dpr,height*dpr,left,top,width,height);
+ // Smooth water-caustic rings fade naturally at the edge as well.
+ ctx.save();ctx.globalCompositeOperation='screen';
+ for(let n=0;n<3;n++){
+  const rad=(28+n*48+time*26)%radius;
+  const edgeFade=Math.pow(Math.max(0,1-rad/radius),1.4);
+  ctx.beginPath();ctx.ellipse(centerX,centerY,rad,rad*.78,Math.sin(time*.6)*.2,0,Math.PI*2);
+  ctx.strokeStyle='rgba(205,220,222,'+(liquidForce*edgeFade*(.105-n*.023)).toFixed(3)+')';
+  ctx.lineWidth=1.1;ctx.stroke();
+ }
+ ctx.restore();
+}
+if(idleBlack>0.001){ctx.fillStyle='rgba(0,0,0,'+idleBlack.toFixed(4)+')';ctx.fillRect(0,0,w,h)}
+}
+})();
+</script></body></html>
